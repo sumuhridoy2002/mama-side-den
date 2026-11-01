@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>ব্রেক কই মামা?</title>
+    <meta name="description" content="ঢাকার রাস্তায় অটো ড্রাইভিং, ট্রাফিক, চার্জিং, জনতার ধাওয়া এবং সংবাদপত্রের রিপোর্ট। উন্নত UI ও স্বয়ংক্রিয় গ্রাফিক্স সেটিংস।">
+    <meta name="author" content="Ali Azgor Hridoy" />
+    <meta name="theme-color" content="#15110e" />
+	
+    
+  <link rel="stylesheet" href="style.css"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMTAiIGZpbGw9IiMxNzNjMzAiLz48cGF0aCBkPSJNMTA2IDIxMFExMDYgMTMzIDE4NCAxMzNIMzI4UTQwNiAxMzMgNDA2IDIxMFYyNDhIMTA2WiIgZmlsbD0iI2ZmY2Y0NyIvPjxyZWN0IHg9IjEyMyIgeT0iMjM4IiB3aWR0aD0iMjY2IiBoZWlnaHQ9IjEzOSIgcng9IjI0IiBmaWxsPSIjNDJhMTc1Ii8+PHJlY3QgeD0iMTQ3IiB5PSIyMjQiIHdpZHRoPSIyMTgiIGhlaWdodD0iNzMiIHJ4PSI3IiBmaWxsPSIjMTkzZTM1Ii8+PHBhdGggZD0iTTI1NiAyMjRWMjk4IiBzdHJva2U9IiNlOWQ2OTkiIHN0cm9rZS13aWR0aD0iMTIiLz48cmVjdCB4PSIxNDkiIHk9IjM2NyIgd2lkdGg9IjQwIiBoZWlnaHQ9IjU1IiByeD0iMTAiIGZpbGw9IiMwOTFlMTkiLz48cmVjdCB4PSIzMjMiIHk9IjM2NyIgd2lkdGg9IjQwIiBoZWlnaHQ9IjU1IiByeD0iMTAiIGZpbGw9IiMwOTFlMTkiLz48Y2lyY2xlIGN4PSIxNjkiIGN5PSIzMzUiIHI9IjEyIiBmaWxsPSIjZmZlN2E0Ii8+PGNpcmNsZSBjeD0iMzQzIiBjeT0iMzM1IiByPSIxMiIgZmlsbD0iI2ZmZTdhNCIvPjxwYXRoIGQ9Ik0yNDEgMzEyIDIxOCAzNDhIMjQ0TDIzNyAzNzggMjc4IDMzNUgyNTBMMjYwIDMxMloiIGZpbGw9IiNmZmNmNDciLz48L3N2Zz4=" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-192.png"></head>
+  <body>
+    <div id="app">
+      <canvas id="c"></canvas>
+      <div id="grade"></div>
+      <div id="vignette"></div>
+      <!-- data-nosnippet: Google never quotes the game screen under a search result (on 25 October 2026 it showed the HUD,
+       "জাতীয় ক্ষতি ৳০ ×২ চার্জ ১০০% চার্জ কম!"); the menu's own words, and the description, stay quotable -->
+      <div id="floaters" data-nosnippet></div>
+      <div id="dialogue" data-nosnippet hidden aria-live="polite"></div>
+      <div id="hint" data-nosnippet hidden></div>
+
+      <div id="meme" data-nosnippet hidden>
+        <div id="memeTop"></div>
+        <div id="memeBot"></div>
+      </div>
+      <div id="placeCard" data-nosnippet hidden>
+        <span class="live">সরাসরি</span><span class="where"></span>
+      </div>
+      <div id="hud" data-nosnippet hidden>
+        <div class="hud-top">
+          <div id="lossBox">
+            <div class="lbl">জাতীয় ক্ষতি<span id="target" hidden></span></div>
+            <div class="loss-row">
+              <div id="loss">৳০</div>
+              <div id="combo" hidden>×২</div>
+            </div>
+          </div>
+          <div id="battBox">
+            <div class="battery-label">
+              চার্জ <strong id="battPercent">১০০%</strong>
+            </div>
+            <div class="bar"><i id="battBar"></i></div>
+            <div id="battWarn" hidden>চার্জ কম!</div>
+            <div id="chargeNow" hidden></div>
+            <canvas
+              id="minimap"
+              width="280"
+              height="280"
+              aria-label="আশেপাশের চার্জিং পয়েন্টের ম্যাপ"
+            ></canvas>
+            <div id="chargeHint" hidden>
+              <svg id="hintArrow" viewBox="-9 -12 18 22" aria-hidden="true">
+                <path d="M0 -10 L7 8 L0 4 L-7 8 Z" /></svg
+              ><span id="hintText"></span>
+            </div>
+            <div class="hud-btns">
+              <button
+                id="pauseBtn"
+                type="button"
+                aria-label="থামান"
+                title="থামান (P)"
+                hidden
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect
+                    x="6"
+                    y="5"
+                    width="4"
+                    height="14"
+                    rx="1"
+                    fill="currentColor"
+                  />
+                  <rect
+                    x="14"
+                    y="5"
+                    width="4"
+                    height="14"
+                    rx="1"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+              <button
+                id="muteBtn"
+                type="button"
+                aria-label="শব্দ বন্ধ করুন"
+                title="শব্দ (M)"
+              ></button>
+            </div>
+          </div>
+        </div>
+        <div id="alerts">
+          <div id="mobWarn" hidden>
+            পাবলিক পিছে! <small id="mobCount"></small>
+          </div>
+          <div id="wrongWay" hidden>উল্টো পথ · ক্ষতি ×১.৫</div>
+          <div id="vip" hidden>
+            <span id="vipArrow" aria-hidden="true">▲</span
+            ><span>ভিআইপি গাড়ি</span><b id="vipDist"></b>
+          </div>
+          <div id="blockade" hidden>
+            <span id="blockadeArrow" aria-hidden="true">▲</span
+            ><span>অবরোধ</span><small id="blockadeNote"></small
+            ><b id="blockadeDist"></b>
+          </div>
+        </div>
+      </div>
+
+      <div id="touch" data-nosnippet hidden>
+        <div class="grp left">
+          <div class="row">
+            <button
+              class="tbtn chip"
+              id="tHorn"
+              type="button"
+              aria-label="হর্ন"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 10h3.5L16 5v14l-9.5-5H3z" fill="currentColor" />
+                <path
+                  d="M18.5 9l2.5-1.6M19 12h3M18.5 15l2.5 1.6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                /></svg
+              ><span>হর্ন</span>
+            </button>
+            <button
+              class="tbtn chip"
+              id="tBomb"
+              type="button"
+              aria-label="শব্দবোমা"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="10" cy="14.5" r="7" fill="currentColor" />
+                <circle cx="7.6" cy="12" r="1.8" fill="#fff" opacity=".45" />
+                <path
+                  d="M14 9.2l1.8-1.8"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M16.3 6.6c1-1.9 2.6-2.3 3.8-1.2"
+                  fill="none"
+                  stroke="#ffd34d"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M21 2.4l.5 1.6 1.6.5-1.6.5-.5 1.6-.5-1.6-1.6-.5 1.6-.5z"
+                  fill="#ffd34d"
+                /></svg
+              ><span>শব্দবোমা</span>
+            </button>
+          </div>
+          <div class="row">
+            <button
+              class="tbtn round"
+              id="tLeft"
+              type="button"
+              aria-label="বামে"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M15 5 L8 12 L15 19"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+            <button
+              class="tbtn round"
+              id="tRight"
+              type="button"
+              aria-label="ডানে"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M9 5 L16 12 L9 19"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="grp right">
+          <button
+            class="tbtn"
+            id="tBoost"
+            type="button"
+            aria-label="টান দেন, বেশি গতি, বেশি চার্জ খরচ"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M13.5 2L4.5 13.5h6l-1.5 8.5 9.5-12h-6z"
+                fill="currentColor"
+              /></svg
+            ><span>টান</span>
+          </button>
+          <div class="pedalcol">
+            <button class="tbtn pedal" id="tGas" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M5 15 L12 8 L19 15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg
+              ><span>চালান</span>
+            </button>
+            <button class="tbtn pedal" id="tBrake" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M5 9 L12 16 L19 9"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg
+              ><span>ব্রেক</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="pause"
+        data-nosnippet
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pauseTitle"
+        hidden
+      >
+        <div class="card">
+          <h2 id="pauseTitle">চা-বিরতি</h2>
+          <p>জ্যাম তো আর পালাচ্ছে না।</p>
+          <button class="cta" id="resumeBtn" type="button">চালিয়ে যান</button>
+          <div class="row">
+            <button class="ghost" id="pauseSound" type="button"></button
+            ><button class="ghost" id="pauseHome" type="button">হোম</button>
+          </div>
+        </div>
+      </div>
+      <div id="countdown" data-nosnippet aria-live="assertive" hidden></div>
+
+      <div id="menu" hidden>
+        <div class="menu-card">
+          <div class="menu-main">
+            <i class="garland" aria-hidden="true"></i>
+            <div>
+              <h1 class="title">ব্রেক কই মামা?</h1>
+              
+              
+            </div>
+            <p class="tagline">রাস্তা কি আপনার বাপের?</p>
+            <p class="how">
+              <em
+                ><span>আপনার সন্তানকে টেসলা দিন:</span>
+                <span>নো লাইসেন্স, নো ব্রেক।</span></em
+              ><span class="dup"
+                >ধাক্কায় ক্ষতি বাড়ান। বাস-ট্রাক এড়ান।<br />পাবলিক ধরার আগেই
+                পালান।</span
+              >
+            </p>
+            <p class="dare" id="dare" hidden></p>
+            <div class="play-row">
+              <button class="cta" id="playBtn" type="button">
+                রাস্তায় নামুন ↗
+              </button>
+              <button
+                class="menu-install"
+                id="menuInstall"
+                type="button"
+                hidden
+                aria-label="ডাউনলোড: গেমটা ইনস্টল করে রাখুন, পরের বার এক টাচে, নেট ছাড়াও"
+                title="ডাউনলোড: পরের বার এক টাচে, নেট ছাড়াও"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
+                </svg>
+              </button>
+              <span class="best" id="menuBest" data-nosnippet></span>
+              <p class="menu-sub" id="menuSub" hidden>
+                <span data-nosnippet
+                  ><button class="linkish" id="menuSubOpen" type="button">
+                    নতুন গেম এলে খবর চান? সাবস্ক্রাইব করুন
+                  </button></span
+                >
+              </p>
+              <p class="menu-install-how" id="menuInstallHow" hidden>
+                <span data-nosnippet
+                  >ব্রাউজারের শেয়ার বোতাম (⬆) চাপুন, তারপর “Add to Home
+                  Screen”। আইকন থেকে খুললে পুরো স্ক্রিনে চলবে।</span
+                >
+              </p>
+            </div>
+          </div>
+          <details class="help" id="help">
+            <summary>কীভাবে খেলবেন</summary>
+            <ul class="rules">
+              <li>
+                <b class="ic">💥</b
+                ><span
+                  ><strong>ধাক্কা দেন</strong>গাড়ি, বাইক, দোকান: যত ভাঙবেন, তত
+                  জাতীয় ক্ষতি</span
+                >
+              </li>
+              <li>
+                <b class="ic bus">🚌</b
+                ><span
+                  ><strong>বাস-ট্রাক ছুঁলেই শেষ</strong>নিচে লাল আলো মানে দূরে
+                  থাকেন</span
+                >
+              </li>
+              <li>
+                <b class="ic">🏃</b
+                ><span
+                  ><strong>পাবলিক দৌড়াবে</strong>ধরতে পারলে ধোলাই, তার আগেই
+                  পালান</span
+                >
+              </li>
+              <li>
+                <b class="ic volt"
+                  ><svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M13.5 2L4.5 13.5h6l-1.5 8.5 9.5-12h-6z"
+                      fill="currentColor"
+                    /></svg></b
+                ><span
+                  ><strong>চার্জ শেষ?</strong>হলুদ দাগে থামেন, লাইন সরাসরি মেইন
+                  থেকে</span
+                >
+              </li>
+              <li>
+                <b class="ic tk">৳</b
+                ><span
+                  ><strong>সানডে মানডে ক্লোজ</strong>গোলাপি দাগে মামাকে চা-পানি,
+                  মামলা ক্লোজ</span
+                >
+              </li>
+            </ul>
+            <div class="keys" id="keysHelp" data-nosnippet>
+              <span class="k"><kbd>W</kbd><kbd>↑</kbd> চালান</span
+              ><span class="k"><kbd>S</kbd><kbd>↓</kbd> ব্রেক</span
+              ><span class="k"><kbd>A</kbd><kbd>D</kbd> ঘোরান</span
+              ><span class="k"><kbd>Shift</kbd><kbd>Space</kbd> টান দেন</span
+              ><span class="k"><kbd>H</kbd> হর্ন</span
+              ><span class="k"><kbd>B</kbd> শব্দবোমা</span
+              ><span class="k"><kbd>M</kbd> শব্দ</span>
+            </div>
+            <p class="keys-note" id="keysNote">
+              <span data-nosnippet
+                >কিছু কিবোর্ড ↑ + ← + Space একসাথে ধরতে পারে না। তখন Space-এর
+                বদলে ডান Shift চাপেন, অথবা ↑ ছেড়ে শুধু Space ধরেন: টান দিলে অটো
+                এমনিই চলে।</span
+              >
+            </p>
+          </details>
+        </div>
+        <div class="menu-corner">
+          <a
+            class="fb-page"
+            href="https://www.facebook.com/brakeKoiMamagame"
+            target="_blank"
+            rel="noopener"
+            aria-label="ব্রেক কই মামা?, ফেসবুক পেজ"
+            title="ব্রেক কই মামা?, ফেসবুক পেজ"
+            ><svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M13.6 21v-7.2h2.5l.4-3h-2.9V8.9c0-.9.3-1.5 1.5-1.5h1.5V4.7a19 19 0 0 0-2.2-.1c-2.2 0-3.7 1.3-3.7 3.8v2.4H8.3v3h2.4V21z"
+              /></svg
+            ><span class="fb-label">ফেসবুক পেজ</span></a
+          ><a
+            class="menu-tube"
+            href="https://www.youtube.com/@brakeKoiMamagame"
+            target="_blank"
+            rel="noopener"
+            aria-label="ব্রেক কই মামা?, ইউটিউব চ্যানেল"
+            title="ব্রেক কই মামা?, ইউটিউব চ্যানেল"
+            ><svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9.5 7.2v9.6l7.6-4.8z" /></svg
+            ><span class="tube-label">ইউটিউব</span></a
+          ><button class="wanted-tag" id="wantedOpen" type="button" hidden>
+            মোস্ট ওয়ান্টেড
+          </button>
+        </div>
+        <p class="menu-note">
+          <span title="মূল রেকর্ড করা ভয়েস ক্লিপ ও অনলাইন সেবা এই সোর্সে সরবরাহ করা হয়নি"
+            >HTML · CSS · JavaScript</span
+          ><span aria-hidden="true"> · </span
+          ><a href="#" target="_blank" rel="noopener"
+            >গাইড</a
+          ><span aria-hidden="true"> · </span
+          ><a
+            href="#"
+            target="_blank"
+            rel="noopener"
+            >ডিসক্লেইমার</a
+          >
+        </p>
+        <a
+          class="credit"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          lang="en"
+          ><i class="face" aria-hidden="true"></i>Made by
+          <b>Ali Azgor Hridoy</b
+          ><svg viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M4 2h6v6M10 2 3 9" /></svg
+        ></a>
+      </div>
+
+      <div id="paper" data-nosnippet hidden>
+        <article class="np" aria-live="polite">
+          <div class="np-scroll">
+            <header>
+              <div class="np-mast">
+                <p class="np-ear"><small>যানজট</small><b>১০/১০</b></p>
+                <div class="np-name">দৈনিক যানজট</div>
+                <p class="np-ear"><small>বায়ুমান</small><b>অস্বাস্থ্যকর</b></p>
+              </div>
+              <div class="np-meta">
+                <span id="npDate"></span
+                ><span>জ্যামে আটকে থাকা মানুষের কণ্ঠস্বর</span
+                ><span>মূল্য: ১০ টাকা</span>
+              </div>
+            </header>
+            <p class="np-kicker">শীর্ষ সংবাদ</p>
+            <h2 id="npHead"></h2>
+            <div class="np-body">
+              <div class="np-left">
+                <figure>
+                  <div class="np-photo">
+                    <img id="npPhoto" alt="ঘটনাস্থলের ছবি" /><span
+                      class="np-stamp"
+                      ><small>জাতীয় ক্ষতি</small><b id="npStamp"></b
+                    ></span>
+                  </div>
+                  <figcaption>
+                    ঘটনাস্থলের ছবি তুলেছেন একজন পথচারী, যিনি সাহায্য না করে
+                    ভিডিও করছিলেন
+                  </figcaption>
+                </figure>
+              </div>
+              <div class="np-buy">
+                <div class="np-price">
+                  <span id="npPriceLead">এই টাকায় হতো</span><b id="npPrice"></b
+                  ><small id="npPriceFact"></small>
+                </div>
+                <p class="np-dare" id="npDare" hidden></p>
+              </div>
+              <div class="np-right">
+                <blockquote class="np-quote">
+                  <p id="npQuoteText"></p>
+                  <cite id="npQuoteWho"></cite>
+                </blockquote>
+                <div class="np-cols" id="npStats"></div>
+              </div>
+            </div>
+            <p class="np-foot">
+              ঘটনা তদন্তে তিন সদস্যের একটি কমিটি গঠন করা হয়েছে। কমিটিকে সাত
+              কার্যদিবসের মধ্যে প্রতিবেদন জমা দিতে বলা হয়েছে। এর আগের ৪১টি
+              কমিটির প্রতিবেদন এখনও জমা পড়েনি।
+            </p>
+            <p class="np-patron" id="npPatron" hidden></p>
+            <p class="np-imprint">
+              সম্পাদক:
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener"
+                >ওমর ফারুক রিয়াদ</a
+              >
+            </p>
+          </div>
+          <div class="np-actions">
+            <button class="cta" id="againBtn" type="button">আবার চালান</button>
+            <button
+              class="np-home"
+              id="homeBtn"
+              type="button"
+              aria-label="হোম: শুরুর পাতায় ফিরে যান"
+              title="হোম"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3.5 11 12 4l8.5 7" />
+                <path d="M6 9.5V20h4.5v-5.5h3V20H18V9.5" /></svg
+              ><span>হোম</span>
+            </button>
+            <button
+              class="np-share-open"
+              id="npShareOpen"
+              type="button"
+              aria-label="শেয়ার করুন"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="npShares"
+              title="শেয়ার"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 14.5V3.5M7.5 8 12 3.5 16.5 8" />
+                <path d="M5 12v8h14v-8" /></svg
+              ><span>শেয়ার</span>
+            </button>
+            <i class="np-break" aria-hidden="true"></i>
+            <div class="np-shares" id="npShares">
+              <button class="share" id="shareBtn" type="button">
+                ছবি শেয়ার
+              </button>
+              <button class="share" id="clipBtn" type="button" hidden>
+                ভিডিও শেয়ার
+              </button>
+              <a
+                class="np-fb"
+                id="fbBtn"
+                href="https://www.facebook.com/brakeKoiMamagame"
+                target="_blank"
+                rel="noopener"
+                hidden
+                title="ফেসবুকে পোস্ট করুন"
+                ><svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M13.6 21v-7.2h2.5l.4-3h-2.9V8.9c0-.9.3-1.5 1.5-1.5h1.5V4.7a19 19 0 0 0-2.2-.1c-2.2 0-3.7 1.3-3.7 3.8v2.4H8.3v3h2.4V21z"
+                  /></svg
+                ><span>ফেসবুকে পোস্ট</span></a
+              >
+              <button
+                class="np-ig"
+                id="igBtn"
+                type="button"
+                hidden
+                title="ইনস্টাগ্রামে দিন"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.2" cy="6.8" r=".6" /></svg
+                ><span id="igWord">ইনস্টাগ্রাম</span>
+              </button>
+            </div>
+            <div class="np-record">
+              <span class="best" id="npBest"></span
+              ><a
+                class="np-credit np-credit-phone"
+                href="#"
+                target="_blank"
+                rel="noopener"
+                lang="en"
+                ><i class="face" aria-hidden="true"></i>Made by
+                <b>Ali Azgor Hridoy</b
+                ><svg viewBox="0 0 12 12" aria-hidden="true">
+                  <path d="M4 2h6v6M10 2 3 9" /></svg
+              ></a>
+            </div>
+            <div class="np-subline" id="npLines">
+              <span id="npWanted" hidden
+                ><button class="linkish" id="npWantedOpen" type="button">
+                  মোস্ট ওয়ান্টেড তালিকা দেখুন
+                </button></span
+              >
+              <form class="np-name" id="npName" hidden novalidate>
+                <label class="sub-label" for="npNameIn"
+                  >পোস্টারে কী নামে উঠবেন?</label
+                ><input
+                  id="npNameIn"
+                  name="name"
+                  type="text"
+                  maxlength="40"
+                  autocomplete="nickname"
+                  spellcheck="false"
+                  placeholder="পোস্টারে কী নামে উঠবেন?"
+                /><button class="np-name-go" id="npNameGo" type="submit">
+                  নাম দিন</button
+                ><span
+                  class="np-name-say"
+                  id="npNameSay"
+                  role="status"
+                  aria-live="polite"
+                ></span>
+              </form>
+              <span id="npSubLine" hidden
+                >নতুন গেম এলে খবর চান?
+                <button class="linkish" id="npSubOpen" type="button">
+                  সাবস্ক্রাইব করুন
+                </button></span
+              ><a
+                class="np-credit"
+                href="#"
+                target="_blank"
+                rel="noopener"
+                lang="en"
+                ><i class="face" aria-hidden="true"></i>Made by
+                <b>Ali Azgor Hridoy</b
+                ><svg viewBox="0 0 12 12" aria-hidden="true">
+                  <path d="M4 2h6v6M10 2 3 9" /></svg
+              ></a>
+            </div>
+            <button
+              class="np-install"
+              id="npInstall"
+              type="button"
+              hidden
+              aria-label="হোম স্ক্রিনে রাখুন: পরের বার এক টাচে, নেট ছাড়াও"
+              title="হোম স্ক্রিনে রাখুন: পরের বার এক টাচে, নেট ছাড়াও"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="6" y="2" width="12" height="20" rx="2.5" />
+                <path d="M12 7v7M9 11l3 3 3-3" /></svg
+              ><span>ইনস্টল</span>
+            </button>
+            <p class="np-install-how" id="npInstallHow" hidden>
+              ব্রাউজারের শেয়ার বোতাম (⬆) চাপুন, তারপর “Add to Home Screen”।
+              আইকন থেকে খুললে পুরো স্ক্রিনে চলবে।
+            </p>
+            <p class="np-inapp" id="npInApp" hidden></p>
+          </div>
+        </article>
+      </div>
+
+      <div
+        id="subscribe"
+        data-nosnippet
+        hidden
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="subTitle"
+      >
+        <form class="sub-card" id="subForm" novalidate>
+          <button
+            class="sub-x"
+            id="subClose"
+            type="button"
+            aria-label="বন্ধ করুন"
+          >
+            ×
+          </button>
+          <span class="sub-tab">দৈনিক যানজট</span>
+          <h2 id="subTitle">নতুন গেম এলে জানাব</h2>
+          <p class="sub-lead">
+            নতুন গেম বের হলে একটা ইমেইল পাবেন, এর বেশি কিছু না।
+          </p>
+          <label class="sub-label" for="subEmail">আপনার ইমেইল</label>
+          <div class="sub-row">
+            <input
+              id="subEmail"
+              name="email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              maxlength="254"
+              placeholder="nam@example.com"
+              required
+            /><button class="cta" id="subSend" type="submit">
+              সাবস্ক্রাইব
+            </button>
+          </div>
+          <input
+            class="sub-hp"
+            id="subWeb"
+            name="website"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+          />
+          <p class="sub-say" id="subSay" role="status" aria-live="polite"></p>
+          <button class="cta sub-ok" id="subOk" type="button">ঠিক আছে</button>
+          <p class="sub-fine">
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener"
+              >গোপনীয়তা</a
+            >
+          </p>
+        </form>
+      </div>
+      <div id="check" data-nosnippet>
+        <p id="checkSay" hidden>
+          মোস্ট ওয়ান্টেড তালিকায় তোলার আগে একটা ছোট যাচাই
+        </p>
+        <div id="checkSlot"></div>
+      </div>
+      <div
+        id="wanted"
+        data-nosnippet
+        hidden
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="wTitle"
+      >
+        <div class="w-card">
+          <button
+            class="sub-x"
+            id="wClose"
+            type="button"
+            aria-label="বন্ধ করুন"
+          >
+            ×
+          </button>
+          <h2 id="wTitle">মোস্ট ওয়ান্টেড</h2>
+          <p class="w-lead">
+            সবচেয়ে বেশি জাতীয় ক্ষতি করা চালক। ধরিয়ে দিলে পুরস্কার: এক কাপ চা।
+          </p>
+          <div class="w-tabs" role="tablist">
+            <button role="tab" id="wTabWeek" type="button" aria-selected="true">
+              এই সপ্তাহ</button
+            ><button
+              role="tab"
+              id="wTabAll"
+              type="button"
+              aria-selected="false"
+            >
+              সর্বকালের
+            </button>
+          </div>
+          <ol class="w-list" id="wList" aria-live="polite"></ol>
+          <p class="w-me" id="wMe" hidden></p>
+          <form class="w-name" id="wName" hidden novalidate>
+            <label for="wNameIn">পোস্টারে আপনার নাম</label>
+            <div class="sub-row">
+              <input
+                id="wNameIn"
+                name="name"
+                type="text"
+                maxlength="40"
+                autocomplete="nickname"
+                spellcheck="false"
+                placeholder="যেমন: উল্টাপথের রাজা"
+              /><button class="cta" id="wNameSend" type="submit">
+                নাম দিন
+              </button>
+            </div>
+            <p class="sub-say" id="wSay" role="status" aria-live="polite"></p>
+          </form>
+          <p class="w-fine">
+            প্রতি শুক্রবার রাত ১২টায় নতুন সপ্তাহ ·
+            <a
+              href="https://www.facebook.com/brakeKoiMamagame"
+              target="_blank"
+              rel="noopener"
+              >ফেসবুক পেজ</a
+            >
+            ·
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener"
+              >গোপনীয়তা</a
+            >
+          </p>
+        </div>
+      </div>
+      <div id="controls" data-nosnippet hidden></div>
+      <div id="ticker" data-nosnippet hidden>
+        <span class="tag" id="tickerTag">খবর</span>
+        <div class="track"></div>
+        <span class="url" lang="en" aria-hidden="true">brakeKoiMama.com</span>
+      </div>
+      <div id="loading" data-nosnippet>
+        <div class="ld">
+          <i class="garland" aria-hidden="true"></i><b>ব্রেক কই মামা?</b
+          ><span>লোড হচ্ছে…</span>
+          <p id="bootMsg" role="alert" hidden></p>
+          <button
+            class="cta"
+            id="bootRetry"
+            type="button"
+            hidden
+            onclick="location.reload()"
+          >
+            আবার চেষ্টা করুন</button
+          ><i class="garland" aria-hidden="true"></i>
+        </div>
+      </div>
+      
+    </div>
+	
+    
+    
+  <div id="driveTop" hidden class="drive-top"><a href="#" class="drive-logo" aria-label="ব্রেক কই মামা? হোম"><span>BR<span class="logo-dot">●</span></span></a><div class="drive-nav"><button id="recordsOpen" type="button">রেকর্ড <span>↗</span></button><button id="settingsOpen" type="button" aria-label="সেটিংস খুলুন">⚙ <span>সেটিংস</span></button></div></div>
+
+<div id="driveStats" hidden class="drive-menu-stats"><div><span>নিজের সেরা</span><b id="driveBest">৳০</b></div><div><span>সংরক্ষিত অভিযান</span><b id="driveRuns">০</b></div><div><span>গ্রাফিক্স</span><b id="driveQualityName">স্বয়ংক্রিয়</b></div></div>
+<div id="driveCluster" hidden aria-hidden="true"><div><b id="driveSpeed">০</b><small>কিমি/ঘণ্টা</small></div><span class="cluster-rule"></span><div class="drive-gear-info"><small id="driveGearName">প্রস্তুত</small><span id="driveBoostReady">টান: Shift</span></div><div id="drivePerf" hidden>— FPS</div></div>
+<section id="driveSettings" class="drive-overlay" role="dialog" aria-modal="true" aria-labelledby="driveSettingsTitle" hidden><div class="drive-dialog"><div class="drive-dialog-head"><div><h2 id="driveSettingsTitle">আপনার মতো করে চালান</h2></div><button class="drive-close" id="settingsClose" aria-label="সেটিংস বন্ধ করুন">×</button></div><p class="drive-dialog-intro">কম শক্তির ফোনে স্বয়ংক্রিয় মোড রাখুন। গেম প্রয়োজনমতো গ্রাফিক্স কমিয়ে নেবে।</p><div class="drive-setting-grid"><label>গ্রাফিক্স<select id="driveQuality"><option value="auto">স্বয়ংক্রিয় — প্রস্তাবিত</option><option value="0">উচ্চ — ছায়াসহ</option><option value="1">ব্যালান্সড</option><option value="2">লো — দ্রুত</option><option value="3">সর্বনিম্ন — দুর্বল ফোন</option></select></label><label>ফ্রেম রেট<select id="driveFrameRate"><option value="60">৬০ FPS লক্ষ্য</option><option value="30">৩০ FPS — ব্যাটারি সাশ্রয়</option></select></label><label>দিনের সময়<select id="driveTime"><option value="auto">অভিযান অনুযায়ী বদলাবে</option><option value="morning">সকাল</option><option value="afternoon">বিকেল</option><option value="dusk">গোধূলি</option><option value="night">রাত</option></select></label><label>কোথা থেকে শুরু করবেন<select id="driveStart"><option value="auto">প্রতি রানে নতুন জায়গা</option><option value="shahbag">শাহবাগ</option><option value="gulistan">গুলিস্তান</option><option value="mirpur10">মিরপুর ১০</option><option value="uttara">উত্তরা</option><option value="jatrabari">যাত্রাবাড়ী</option></select></label></div><label class="drive-volume" for="driveVolume">শব্দের মাত্রা <output id="driveVolumeValue">৭০%</output><input id="driveVolume" type="range" min="0" max="100" step="5"></label><div class="drive-toggles"><label><span>কম অ্যানিমেশন<small>স্ক্রিন শেক ও বাড়তি নড়াচড়া কমান</small></span><input type="checkbox" id="driveMotion"></label><label><span>বড় টাচ বোতাম<small>ফোনে আঙুলের জন্য বাড়তি জায়গা</small></span><input type="checkbox" id="driveLarge"></label><label><span>FPS দেখান<small>চলার সময় বাস্তব ফ্রেম রেট</small></span><input type="checkbox" id="driveShowFps"></label><label><span>বাংলা ডিভাইস ভয়েস<small id="driveVoiceNote">ডিভাইসে বাংলা ভয়েস থাকলে সংলাপ পড়বে</small></span><input type="checkbox" id="driveVoice"></label></div><div id="driveCapability" class="drive-capability"></div><p id="driveSettingsNote" role="status"></p><button class="drive-primary" id="settingsDone">ঠিক আছে, মামা ↗</button></div></section>
+<section id="driveRecords" class="drive-overlay" role="dialog" aria-modal="true" aria-labelledby="driveRecordsTitle" hidden><div class="drive-dialog"><div class="drive-dialog-head"><div><h2 id="driveRecordsTitle">নিজের মোস্ট ওয়ান্টেড</h2></div><button id="recordsClose" class="drive-close" aria-label="রেকর্ড বন্ধ করুন">×</button></div><p class="drive-dialog-intro">এই ব্রাউজারের সর্বশেষ ৩০টি সংরক্ষিত অভিযান। এটি অনলাইন বা অন্য খেলোয়াড়ের লিডারবোর্ড নয়।</p><div class="drive-tabs" role="tablist" aria-label="রেকর্ডের সময়"><button id="recordAll" role="tab" aria-selected="true">সব সংরক্ষিত</button><button id="recordWeek" role="tab" aria-selected="false">গত ৭ দিন</button></div><div id="driveRecordList"></div><button id="recordsExport" class="drive-secondary">অভিযানের রিপোর্ট ডাউনলোড ↓</button></div></section>
+<div id="driveOfflineNotice" role="status" hidden></div>
+<script src="script.js"></script></body>
+</html>
