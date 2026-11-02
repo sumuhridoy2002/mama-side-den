@@ -1,6 +1,6 @@
 /* Offline game shell only. Never caches sign-in routes or external data. */
 const PREFIX = "brake-koi-mama:" + self.registration.scope + ":";
-const CACHE = PREFIX + "final-20261101";
+const CACHE = PREFIX + "final-20261103";
 const ASSETS = [
   "./",
   "./index.html",
@@ -21,7 +21,10 @@ self.addEventListener("install", (event) =>
           throw new Error("Game cache unavailable");
         await cache.put(path, response);
       }
-    }),
+    })
+      // Take over as soon as the new shell is cached instead of waiting for every
+      // game tab to be closed; script.js reloads once on controllerchange.
+      .then(() => self.skipWaiting()),
   ),
 );
 self.addEventListener("activate", (event) =>

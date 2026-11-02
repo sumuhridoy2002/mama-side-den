@@ -1,0 +1,19 @@
+# Laragon/Apache is served from this folder as a plain static site.
+# Apache's mime.types (2.4.x on this machine) has no mapping for .webmanifest,
+# so the PWA manifest went out with no Content-Type at all and browsers skipped
+# it. This tells Apache what it is; nothing else here needs a server.
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
+<IfModule mod_headers.c>
+    # sw.js and the manifest must never be served from a stale edge cache,
+    # otherwise an update to the game shell can take days to arrive.
+    <FilesMatch "^(sw\.js|manifest\.webmanifest)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/manifest+json image/svg+xml
+</IfModule>

@@ -24579,16 +24579,27 @@ void main() {
         !this.ready || this.muted || ((this.hornHeld = !0), this.playHorn());
       }
       playHorn() {
+        if (!this.ready || this.muted || !this.ctx) return;
         let t = this.ctx.currentTime;
-        if (t < this.hornNext || !this.clips.horn_meme || this.muted) return;
-        let e = this.playForeground("horn_meme", 0.95, 2);
-        if (!e) {
-          this.hornNext = t + 0.5;
+        if (t < this.hornNext) return;
+        let e = this.clips.horn_meme;
+        if (e) {
+          let n = this.playForeground("horn_meme", 0.95, 2);
+          if (!n) {
+            this.hornNext = t + 0.5;
+            return;
+          }
+          ((this.hornVoice = n),
+            this.hornPlays++,
+            (this.hornNext = t + e.duration + 0.5));
           return;
         }
-        ((this.hornVoice = e),
-          this.hornPlays++,
-          (this.hornNext = t + this.clips.horn_meme.duration + 0.5));
+        // This build ships no recorded clips, so synthesise the horn: two short
+        // blasts, alternating timbre, so H is never silent on any device.
+        let s = this.hornPlays++ % 2 ? "cng" : "auto";
+        (this.horn(s, null, 0, 0.14),
+          this.horn(s, null, 0, 0.22, 0.18),
+          (this.hornNext = t + 0.6));
       }
       hornOff(t = !1) {
         var e;
@@ -25654,9 +25665,9 @@ void main() {
         name: "high",
         shadows: !0,
         pixelRatio: 1.75,
-        viewR: 340,
-        fogNear: 70,
-        fogFar: 315,
+        viewR: 420,
+        fogNear: 86,
+        fogFar: 392,
         traffic: 100,
         walkers: 90,
       },
@@ -25664,9 +25675,9 @@ void main() {
         name: "medium",
         shadows: !1,
         pixelRatio: 1.25,
-        viewR: 300,
-        fogNear: 62,
-        fogFar: 278,
+        viewR: 340,
+        fogNear: 72,
+        fogFar: 316,
         traffic: 90,
         walkers: 80,
       },
@@ -25674,9 +25685,9 @@ void main() {
         name: "low",
         shadows: !1,
         pixelRatio: 1,
-        viewR: 250,
-        fogNear: 50,
-        fogFar: 235,
+        viewR: 275,
+        fogNear: 56,
+        fogFar: 258,
         traffic: 60,
         walkers: 50,
       },
@@ -25684,9 +25695,9 @@ void main() {
         name: "lowest",
         shadows: !1,
         pixelRatio: 0.85,
-        viewR: 210,
-        fogNear: 44,
-        fogFar: 196,
+        viewR: 235,
+        fogNear: 50,
+        fogFar: 218,
         traffic: 50,
         walkers: 40,
         stalls: 0.5,
@@ -26100,6 +26111,42 @@ void main() {
         Q("কামারপাড়া", "dense"),
         Q("মৈনারটেক", "dense"),
       ],
+      13: [
+        Q("নবীনগর", "dense"),
+        Q("টঙ্গী", "dense"),
+        Q("টঙ্গী জংশন", "market"),
+        Q("এরশাদনগর", "dense"),
+        Q("মীরের বাজার", "market"),
+        Q("বোর্ডবাজার", "market"),
+        Q("কলেজ গেট", "market"),
+      ],
+      14: [
+        Q("কালিয়াকৈর", "industrial"),
+        Q("কোনাবাড়ী", "dense"),
+        Q("আব্দুল্লাহপুর", "market"),
+        Q("গাজীপুর চৌরাস্তা", "market"),
+        Q("চেরাগ আলী", "dense"),
+        Q("স্টেশন রোড", "market"),
+        Q("টঙ্গী শিল্প এলাকা", "industrial"),
+      ],
+      "-6": [
+        Q("শ্যামপুর", "dense"),
+        Q("মুজগনগর", "dense"),
+        Q("দনিয়া", "dense"),
+        Q("জুরাইন", "dense"),
+        Q("কদমতলা", "dense"),
+        Q("ধোলাইখাল", "old"),
+        Q("নয়াবাজার", "old"),
+      ],
+      "-7": [
+        Q("দক্ষিণ কেরানীগঞ্জ", "industrial"),
+        Q("ফরিদাবাদ", "dense"),
+        Q("নারায়ণগঞ্জ রোড", "market"),
+        Q("চাঁদনীঘাট", "old"),
+        Q("বাবুবাজার", "old"),
+        Q("আমিনবাজার", "market"),
+        Q("দোহার ঘাট", "market"),
+      ],
     },
     Qv = [-3, -2, -1, 1, 2, 3, 4],
     pp = {
@@ -26110,6 +26157,10 @@ void main() {
         Q("কেরানীগঞ্জ", "dense"),
         Q("আশুলিয়া", "industrial"),
         Q("কাউন্দিয়া", "dense"),
+        Q("নবাবগঞ্জ", "dense"),
+        Q("সিঙ্গাইর", "market"),
+        Q("ধামরাই", "dense"),
+        Q("মানিকগঞ্জ রোড", "market"),
       ],
       east: [
         Q("পূর্বাচল", "residential"),
@@ -26118,6 +26169,10 @@ void main() {
         Q("কায়েতপাড়া", "dense"),
         Q("ত্রিমোহনী", "dense"),
         Q("স্টাফ কোয়ার্টার", "dense"),
+        Q("ফতুল্লা", "market"),
+        Q("সিদ্ধিরগঞ্জ", "industrial"),
+        Q("বন্দর", "dense"),
+        Q("নারায়ণগঞ্জ", "market"),
       ],
       south: [
         Q("ওয়ারী", "old"),
@@ -26126,6 +26181,10 @@ void main() {
         Q("ফরাশগঞ্জ", "old"),
         Q("লক্ষ্মীবাজার", "old"),
         Q("পোস্তগোলা", "industrial"),
+        Q("শ্যামপুর", "dense"),
+        Q("মুজগনগর", "dense"),
+        Q("দনিয়া", "dense"),
+        Q("জুরাইন", "dense"),
       ],
       north: [
         Q("টঙ্গী শিল্প এলাকা", "industrial"),
@@ -26134,6 +26193,10 @@ void main() {
         Q("কলেজ গেট", "market"),
         Q("এরশাদনগর", "dense"),
         Q("মীরের বাজার", "market"),
+        Q("টঙ্গী জংশন", "market"),
+        Q("কালিয়াকৈর", "industrial"),
+        Q("কোনাবাড়ী", "dense"),
+        Q("নবীনগর", "dense"),
       ],
     },
     Ds = [],
@@ -26416,6 +26479,110 @@ void main() {
         across: 76,
         label: "হাতিরঝিল",
       },
+      {
+        a: -3,
+        b: -2,
+        kind: "lalbagh",
+        qx: -1,
+        qz: 1,
+        along: 78,
+        across: 60,
+        label: "লালবাগ কেল্লা",
+        trees: 22,
+        foot: [16, 12],
+        sign: {
+          text: "লালবাগ কেল্লা",
+          ink: "#fff3d6",
+          edge: "#5a1a12",
+          at: [0, 12.4, 29.2],
+          w: 12,
+        },
+      },
+      {
+        a: -2,
+        b: -5,
+        kind: "ahsan",
+        qx: -1,
+        qz: 1,
+        along: 74,
+        across: 54,
+        label: "আহসান মঞ্জিল",
+        trees: 10,
+        foot: [12, 9],
+        sign: {
+          text: "আহসান মঞ্জিল",
+          ink: "#3b2318",
+          edge: "#f7ecdc",
+          at: [0, 10.8, 11.8],
+          w: 13,
+        },
+      },
+      {
+        a: -4,
+        b: 5,
+        kind: "soudho",
+        qx: -1,
+        qz: 1,
+        along: 70,
+        across: 52,
+        label: "জাতীয় স্মৃতিসৌধ, সাভার",
+        trees: 18,
+        foot: [16, 11],
+        sign: {
+          text: "জাতীয় স্মৃতিসৌধ",
+          ink: "#20332c",
+          edge: "#f2ede2",
+          at: [0, 6.2, 25.4],
+          w: 14,
+        },
+      },
+      {
+        a: -1,
+        b: 7,
+        kind: "metro",
+        qx: -1,
+        qz: 1,
+        along: 64,
+        across: 34,
+        label: "মিরপুর ১০ মেট্রো স্টেশন",
+        queue: 9,
+        sign: {
+          text: "মিরপুর ১০ মেট্রো",
+          ink: "#ffffff",
+          edge: "#12604a",
+          at: [0, 17.6, 6.9],
+          w: 12,
+        },
+      },
+      {
+        a: 2,
+        b: 10,
+        kind: "airport",
+        qx: 1,
+        qz: 1,
+        along: 100,
+        across: 76,
+        label: "হযরত শাহজালাল আন্তর্জাতিক বিমানবন্দর",
+        queue: 10,
+        sign: {
+          text: "হযরত শাহজালাল আন্তর্জাতিক বিমানবন্দর",
+          ink: "#123c56",
+          edge: "#f4f7f8",
+          at: [0, 8.2, 2.9],
+          w: 26,
+        },
+      },
+      {
+        a: 3,
+        b: 5,
+        kind: "jheel",
+        qx: 1,
+        qz: 1,
+        along: 96,
+        across: 76,
+        label: "গুলশান লেক",
+        trees: 26,
+      },
     ],
     bc = { a: 0, b: 0 },
     An = { from: zt + 5, len: 250, edge: 3.6 },
@@ -26431,6 +26598,17 @@ void main() {
       "কারওয়ান বাজার",
       "মৌচাক",
       "মালিবাগ",
+      "মহাখালী",
+      "গুলশান ২",
+      "বনানী",
+      "ধানমন্ডি",
+      "আসাদগেট",
+      "মিরপুর ১",
+      "শেওড়াপাড়া",
+      "রামপুরা",
+      "খিলগাঁও",
+      "মগবাজার",
+      "সায়েন্স ল্যাব",
     ]),
     mp = (i, t, e) => {
       let n = Ds[Or(i === "A" ? t : e, i === "A" ? e : t)];
@@ -32066,6 +32244,206 @@ varying float vBulb;
       i.box(0, 0.3 + t * 0.45, 26 - t * 1.3, 40 - t * 3, 0.45, 1.3, 14078148);
     return i.build();
   }
+  /* Old Dhaka above the river: a red sandstone fort (walls, bastions, the
+     three-domed mosque and Paribibi's marble tomb) with the gate facing the road. */
+  function Lab() {
+    let i = new ct(),
+      wall = 0xa8412f,
+      brick = 0x8d3524,
+      lawn = 0x4a7a38,
+      path = 0xc3b49a,
+      marble = 0xefe6d6,
+      dome = 0xf3e9d6,
+      gold = 0xd2a63c,
+      dark = 0x2a1a14;
+    (i.box(0, 0.1, 0, 76, 0.2, 58, lawn),
+      i.box(0, 0.14, 2, 14, 0.06, 50, path),
+      i.box(0, 3.5, -27, 76, 7, 1.8, wall),
+      i.box(0, 3.5, 27, 76, 7, 1.8, wall),
+      i.box(-37, 3.5, 0, 1.8, 7, 54, wall),
+      i.box(37, 3.5, 0, 1.8, 7, 54, wall));
+    for (let t = -36; t <= 36; t += 4)
+      for (let e of [-27, 27]) i.box(t, 7.4, e, 1.5, 1.1, 2.2, brick);
+    for (let t = -25; t <= 25; t += 4)
+      for (let e of [-37, 37]) i.box(e, 7.4, t, 2.2, 1.1, 1.5, brick);
+    for (let t of [-35, 35])
+      for (let e of [-25, 25]) {
+        (i.cyl(t, 4.3, e, 3.5, 8.6, wall, { seg: 10 }),
+          i.cyl(t, 9.1, e, 3.8, 1, brick, { seg: 10 }),
+          i.sph(t, 10.4, e, 2.3, 1.7, 2.3, dome));
+      }
+    (i.box(0, 5.3, 28, 10, 10.6, 2.6, brick),
+      i.box(0, 3.9, 29.2, 4.4, 7.8, 0.6, dark),
+      i.box(-6.6, 4.4, 28, 2.6, 8.8, 2.6, brick),
+      i.box(6.6, 4.4, 28, 2.6, 8.8, 2.6, brick),
+      i.cyl(0, 11.1, 28, 4.6, 1.6, marble, { seg: 12 }),
+      i.sph(0, 13.2, 28, 4, 3, 4, dome),
+      i.cyl(0, 16.4, 28, 0.3, 1.6, gold, { seg: 6 }),
+      i.sph(-6.6, 9.4, 28, 1.5, 1.2, 1.5, dome),
+      i.sph(6.6, 9.4, 28, 1.5, 1.2, 1.5, dome));
+    (i.box(0, 4, -8, 14, 8, 14, marble),
+      i.box(0, 8.4, -8, 14.6, 0.7, 14.6, 0xf8f2e6),
+      i.cyl(0, 9.4, -8, 5.2, 1.6, marble, { seg: 12 }),
+      i.sph(0, 11.8, -8, 5.4, 4.2, 5.4, dome),
+      i.cyl(0, 16.2, -8, 0.3, 2, gold, { seg: 6 }));
+    (i.box(-24, 3.2, -4, 18, 6.4, 12, brick),
+      i.box(-24, 6.8, -4, 18.6, 0.6, 12.6, marble));
+    for (let t of [-30, -24, -18])
+      (i.cyl(t, 7.6, -4, 2.3, 1.2, marble, { seg: 10 }),
+        i.sph(t, 9.4, -4, 2.2, 2.1, 2.2, dome));
+    return i.build();
+  }
+  /* Ahsan Manzil: the pink palace at Islampur, with its dome, corner chhatris
+     and the staircase down to the river side. */
+  function Ahs() {
+    let i = new ct(),
+      pink = 0xd79aa6,
+      rose = 0xc78493,
+      cream = 0xf3e6cd,
+      white = 0xf8f1e3,
+      dark = 0x3a2c26,
+      glass = 0x445a63,
+      gold = 0xd2a63c,
+      lawn = 0x517f3f;
+    (i.box(0, 0.12, 0, 72, 0.24, 52, lawn),
+      i.box(0, 0.4, 2, 62, 0.8, 44, 0xd9cbb2));
+    for (let t = 0; t < 7; t++)
+      i.box(0, 0.5 + t * 0.42, 20 - t * 1.1, 17 - t * 0.9, 0.42, 1.1, 0xe7dbc4);
+    (i.box(0, 6, -3, 60, 10, 26, pink),
+      i.box(0, 11.2, -3, 60.8, 0.9, 26.8, cream),
+      i.box(0, 1.6, -3, 61, 1.2, 27, rose));
+    for (let t = -24; t <= 24; t += 4)
+      (i.box(t, 3.6, 10.2, 2.2, 4.4, 0.3, dark),
+        i.cyl(t, 5.6, 10.2, 1.1, 0.4, dark, { axis: "z", seg: 10 }));
+    for (let t = -22; t <= 22; t += 5.5)
+      i.box(t, 8.6, 10.2, 1.7, 2.6, 0.3, glass);
+    (i.box(0, 2, 16, 14, 0.4, 3, cream),
+      i.box(-6, 2.6, 17, 0.5, 5.2, 0.5, white),
+      i.box(6, 2.6, 17, 0.5, 5.2, 0.5, white),
+      i.box(0, 5.4, 17, 13, 0.4, 0.8, white));
+    (i.box(0, 8.4, -2, 17, 16, 18, pink),
+      i.box(0, 16.6, -2, 17.6, 0.8, 18.6, cream),
+      i.cyl(0, 18.4, -2, 5.6, 3.4, cream, { seg: 16 }),
+      i.sph(0, 22, -2, 5.8, 5, 5.8, white),
+      i.cyl(0, 26.6, -2, 0.35, 2.2, gold, { seg: 6 }),
+      i.sph(0, 28, -2, 0.6, 0.6, 0.6, gold));
+    for (let t of [-29, 29])
+      for (let e of [-14, 8]) {
+        (i.cyl(t, 11.9, e, 1.1, 1.6, cream, { seg: 8 }),
+          i.sph(t, 13.6, e, 1.9, 1.5, 1.9, white),
+          i.cyl(t, 15.1, e, 0.2, 1.3, gold, { seg: 5 }));
+      }
+    for (let t of [-32, 32])
+      (i.box(t, 3.1, 12, 1.7, 6.2, 1.7, white),
+        i.sph(t, 6.8, 12, 1.2, 1, 1.2, cream));
+    return i.build();
+  }
+  /* National Martyrs' Memorial at Savar: seven leaning concrete blade pairs
+     over a reflecting pool and plaza. */
+  function Sdh() {
+    let i = new ct(),
+      concrete = 0xd6d0c2,
+      plaza = 0xb3ad9e,
+      water = 0x35606b,
+      curb = 0xcac4b6;
+    (i.box(0, 0.12, 0, 68, 0.24, 50, plaza),
+      i.box(0, 0.13, 15, 44, 0.1, 12, water),
+      i.box(0, 0.45, 15, 45, 0.9, 12.8, curb),
+      i.box(0, 0.6, -7, 40, 1.2, 24, concrete),
+      i.box(0, 1.3, -7, 34, 0.5, 18, 0xe2dccd));
+    for (let t of [-30, 30])
+      for (let e of [-18, 18]) i.box(t, 1.4, e, 3, 0.8, 3, curb);
+    for (let t = 0; t < 12; t++)
+      i.box(0, 0.5 + t * 0.25, 22 - t * 0.8, 16 - t * 0.6, 0.26, 1, curb);
+    for (let k = -3; k <= 3; k++) {
+      let t = k * 5.4,
+        e = 27 - Math.abs(k) * 3.2;
+      (i.box(t - 1.7, 1.15 + e * 0.5, -7, 0.9, e, 15, concrete, { rz: 0.2 }),
+        i.box(t + 1.7, 1.15 + e * 0.5, -7, 0.9, e, 15, concrete, { rz: -0.2 }),
+        i.box(t, 1.15 + e * 0.92, -7, 3.4, 0.5, 15.4, 0xe6e0d2));
+    }
+    for (let t = -24; t <= 24; t += 6.5)
+      for (let e of [-16, 10]) i.box(t, 0.6, e, 0.5, 0.7, 0.5, 0x6f6a5e);
+    for (let t of [-31, 31]) i.cyl(t, 2.4, 12, 0.9, 4.8, 0x707a6c, { seg: 8 });
+    return i.build();
+  }
+  /* An MRT-6 station on its viaduct: pillars, deck, glass hall, stairs. */
+  function Mtr() {
+    let i = new ct(),
+      steel = 0x9aa3a8,
+      deck = 0xb7bdc0,
+      glass = 0x2c6472,
+      white = 0xe9edee,
+      dark = 0x3b4145,
+      green = 0x1d6b4d;
+    for (let t of [-30, -15, 0, 15, 30])
+      for (let e of [-5, 5]) {
+        (i.cyl(t, 4.9, e, 0.85, 9.8, steel, { seg: 8 }),
+          i.box(t, 10, e, 2.4, 0.5, 2.4, steel));
+      }
+    (i.box(0, 10.6, 0, 62, 0.9, 15, deck),
+      i.box(0, 11.2, -6.8, 62, 1.2, 0.5, steel),
+      i.box(0, 11.2, 6.8, 62, 1.2, 0.5, steel),
+      i.box(0, 14.4, 0, 34, 6.2, 12.4, glass),
+      i.box(0, 17.7, 0, 35.2, 0.7, 13.2, white),
+      i.box(0, 15.4, 6.1, 30, 0.5, 1.1, white));
+    for (let t = -15; t <= 15; t += 3) i.box(t, 14.4, 6.3, 0.24, 6, 0.3, white);
+    for (let t of [-27, 27]) i.box(t, 12.4, 0, 1.2, 3.6, 12.4, 0x8b9296);
+    for (let t of [-4.3, 4.3]) i.box(0, 11.3, t, 62, 0.3, 0.3, dark);
+    for (let t = 0; t < 13; t++)
+      i.box(8, 10 - t * 0.78, 8.4 + t * 0.5, 3.4, 0.3, 0.6, steel);
+    (i.box(8, 4.4, 15, 3.4, 1, 1.6, steel),
+      i.box(-14, 4.4, 15, 3.4, 1, 1.6, steel),
+      i.box(0, 19.3, 6.6, 13, 2.8, 0.5, green),
+      i.box(0, 19.3, 6.9, 13.4, 3.2, 0.2, white));
+    return i.build();
+  }
+  /* Shahjalal airport: terminal with a stepped roof, glass front, control tower
+     and one parked aircraft on the apron. */
+  function Arp() {
+    let i = new ct(),
+      white = 0xeceef0,
+      roof = 0xdde2e5,
+      glass = 0x3d6b79,
+      concrete = 0xb9b5a8,
+      asphalt = 0x4b4e51,
+      body = 0xf2f4f6,
+      dark = 0x2d3336,
+      steel = 0x9ba2a6;
+    (i.box(0, 0.1, 0, 98, 0.2, 74, asphalt),
+      i.box(0, 0.18, 30, 98, 0.1, 8, 0x5b5f62),
+      i.box(-10, 5, -12, 66, 10, 24, white),
+      i.box(-10, 10.5, -12, 67, 0.9, 25, roof));
+    for (let t = -40; t <= 22; t += 4)
+      i.box(t - 10, 5, 0.4, 2.6, 5.6, 0.3, glass);
+    for (let t = 0; t < 3; t++)
+      i.box(-10, 11.2 + t * 0.8, -12 + t * 0.6, 62 - t * 9, 0.7, 22 - t * 6, roof);
+    (i.box(-10, 6.4, 3, 52, 0.5, 6, roof),
+      i.box(-10, 8.2, 5.6, 50, 0.4, 0.4, steel));
+    for (let t = -34; t <= 14; t += 6)
+      i.cyl(t - 10, 4.1, 5.6, 0.3, 8.2, steel, { seg: 6 });
+    (i.cyl(32, 11, -16, 2.4, 22, white, { seg: 10 }),
+      i.cyl(32, 22.6, -16, 3.5, 2.6, glass, { seg: 12 }),
+      i.cyl(32, 24.4, -16, 4, 0.5, roof, { seg: 12 }),
+      i.box(32, 25.6, -16, 0.3, 2, 0.3, 0xc0453c));
+    let t = 12,
+      e = 20;
+    (i.cyl(t, 3.8, e, 2.2, 26, body, { axis: "x", seg: 12 }),
+      i.cyl(t + 13.4, 3.8, e, 1.7, 3, body, { axis: "x", seg: 10 }),
+      i.box(t, 4, e, 7.4, 0.6, 26, roof),
+      i.box(t - 11, 4.2, e, 6, 0.5, 10, roof, { ry: 0.5 }),
+      i.box(t + 9, 6.6, e, 5, 0.6, 8, roof),
+      i.box(t + 12, 8.4, e, 3.4, 4.6, 0.6, body, { rz: 0.35 }),
+      i.box(t, 2.3, e, 5, 2.4, 3, dark));
+    for (let n of [-8, 6])
+      i.cyl(t + n, 2.1, e, 1.1, 1.9, dark, { axis: "z", seg: 8 });
+    for (let n = -46; n <= 46; n += 6) i.box(n, 1.6, 34, 0.25, 3.2, 0.25, steel);
+    i.box(0, 3.15, 34, 94, 0.2, 0.2, steel);
+    (i.box(-30, 0.4, 14, 3, 0.6, 26, concrete),
+      i.box(-30, 0.9, 14, 1.2, 0.6, 22, roof),
+      i.box(4, 0.4, 14, 3, 0.6, 26, concrete));
+    return i.build();
+  }
   var mM = () =>
       It("anandaPoster", () => {
         let i = fe(1024, 384),
@@ -32146,6 +32524,11 @@ varying float vBulb;
       stadium: uM,
       busterminal: dM,
       jheel: pM,
+      lalbagh: Lab,
+      ahsan: Ahs,
+      soudho: Sdh,
+      metro: Mtr,
+      airport: Arp,
     };
   function Nc(i) {
     let t = [new St(It("landmark:" + i, gM[i]), dt.wsolid)];
@@ -32185,6 +32568,39 @@ varying float vBulb;
           .box(0, 9, 0, 34, 18, 34, Ht)
           .build(),
       mukarram: () => new ct().box(0, 15, -4, 24, 30, 24, Ht).build(),
+      lalbagh: () =>
+        new ct()
+          .box(0, 3.6, 0, 76, 7.2, 56, Ht)
+          .box(0, 5.4, 28, 10, 10.8, 3, Ht)
+          .box(0, 4.4, -8, 14, 8.8, 14, Ht)
+          .sph(0, 11.4, -8, 5.4, 4.4, 5.4, Ht)
+          .sph(0, 13.4, 28, 4.6, 3.4, 4.6, Ht)
+          .build(),
+      ahsan: () =>
+        new ct()
+          .box(0, 6, -3, 60, 12, 26, Ht)
+          .box(0, 9, -2, 17, 18, 18, Ht)
+          .cyl(0, 19.4, -2, 5.6, 3.4, Ht, { seg: 12 })
+          .sph(0, 22.8, -2, 5.8, 5, 5.8, Ht)
+          .build(),
+      soudho: () => {
+        let i = new ct();
+        for (let t = -3; t <= 3; t++)
+          i.box(t * 5.4, 8, -7, 4.6, 16 - Math.abs(t) * 1.8, 15, Ht);
+        return i.box(0, 1.1, 15, 44, 0.4, 12, Ht).build();
+      },
+      metro: () =>
+        new ct()
+          .box(0, 10.6, 0, 62, 1, 15, Ht)
+          .box(0, 14.4, 0, 34, 6.2, 12.4, Ht)
+          .build(),
+      airport: () =>
+        new ct()
+          .box(-10, 5, -12, 66, 10, 24, Ht)
+          .cyl(32, 11, -16, 3, 22, Ht, { seg: 8 })
+          .cyl(12, 3.8, 20, 2.2, 26, Ht, { axis: "x", seg: 8 })
+          .box(12, 4, 20, 7.4, 0.6, 26, Ht)
+          .build(),
     },
     pu = {
       stambha: 8038840,
@@ -32192,6 +32608,11 @@ varying float vBulb;
       stadium: 9080724,
       sangsad: 11117204,
       mukarram: 15263456,
+      lalbagh: 0xb4643f,
+      ahsan: 0xe2b9be,
+      soudho: 0xd9d3c6,
+      metro: 0x9fb4b8,
+      airport: 0xdbe1e4,
     };
   function Xp(i) {
     return Vp[i] ? It("sky:" + i, Vp[i]) : null;
@@ -32213,7 +32634,16 @@ varying float vBulb;
   }
   var bM = (i) => (t) => [t.x / i, t.z / i],
     yM = new Yt(15135215),
-    vM = { busterminal: 5593436, kitchen: 9077624, kamalapur: 9077624 },
+    vM = {
+      busterminal: 5593436,
+      kitchen: 9077624,
+      kamalapur: 9077624,
+      lalbagh: 0x8a7a5c,
+      ahsan: 0xd9cbb2,
+      soudho: 0xb3ad9e,
+      metro: 0x8b9296,
+      airport: 0x4b4e51,
+    },
     _M = [
       15255968, 14267276, 13214330, 14727344, 12110248, 14207136, 15128248,
       12887172, 14069956,
@@ -32668,11 +33098,11 @@ varying float vBulb;
       update(t, e, n, s = 1, o = 0.016) {
         for (let l of this.skyline) {
           let c = Math.hypot(l.x - t, l.z - e);
-          ((l.m.visible = c > this.R - 40 && c < 980),
+          ((l.m.visible = c > this.R - 60 && c < 1750),
             l.m.visible &&
               l.m.material.color
                 .copy(l.base)
-                .lerp(yM, Math.min(0.72, 0.35 + (c - this.R) / 2e3)));
+                .lerp(yM, Math.min(0.8, 0.32 + (c - this.R) / 3e3)));
         }
         let r = this.wanted(t, e);
         if (this.keep) {
@@ -46294,7 +46724,9 @@ three/build/three.module.js:
       " • অফলাইন: " +
       (location.protocol === "file:"
         ? "স্থানীয় ফাইল"
-        : navigator.serviceWorker?.controller
+        : !window.isSecureContext
+          ? "লোকালহোস্ট বা https ছাড়া অফলাইন চালু হয় না"
+          : navigator.serviceWorker?.controller
           ? "প্রস্তুত"
           : "প্রস্তুত হচ্ছে");
     $("driveSettingsNote").textContent =
@@ -46331,6 +46763,20 @@ three/build/three.module.js:
     ["driveVoice", "voice"],
   ])
     $(id).onchange = (e) => save({ [key]: e.target.checked });
+  // Speak a sample the moment the voice switch is turned on, so the player hears
+  // straight away what this device can actually do.
+  $("driveVoice").addEventListener("change", (e) => {
+    if (!e.target.checked) {
+      if ("speechSynthesis" in window)
+        try {
+          speechSynthesis.cancel();
+        } catch {}
+      return;
+    }
+    lastVoice = "";
+    voiceAt = performance.now();
+    voiceSay("ব্রেক কই মামা? চলেন, রাস্তায় নামি।");
+  });
   function logs() {
     return (api?.logs() || []).filter(
       (x) => Number.isFinite(x.loss) && Number.isFinite(x.secs),
@@ -46406,21 +46852,224 @@ three/build/three.module.js:
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 3000);
   };
+  let speakTimer = 0,
+    speakUtter = null;
+  const BENGALI = /[\u0980-\u09FF]/;
+  // Bengali -> Latin, so a device without a Bengali voice can still be heard.
+  const LATIN = (() => {
+    const con = {
+        ক: "k",
+        খ: "kh",
+        গ: "g",
+        ঘ: "gh",
+        ঙ: "ng",
+        চ: "ch",
+        ছ: "chh",
+        জ: "j",
+        ঝ: "jh",
+        ঞ: "n",
+        ট: "t",
+        ঠ: "th",
+        ড: "d",
+        ঢ: "dh",
+        ণ: "n",
+        ত: "t",
+        থ: "th",
+        দ: "d",
+        ধ: "dh",
+        ন: "n",
+        প: "p",
+        ফ: "ph",
+        ব: "b",
+        ভ: "bh",
+        ম: "m",
+        য: "j",
+        র: "r",
+        ল: "l",
+        শ: "sh",
+        ষ: "sh",
+        স: "s",
+        হ: "h",
+        ড়: "r",
+        ঢ়: "rh",
+        য়: "y",
+        ৎ: "t",
+      },
+      vowel = {
+        অ: "o",
+        আ: "a",
+        ই: "i",
+        ঈ: "i",
+        উ: "u",
+        ঊ: "u",
+        ঋ: "ri",
+        এ: "e",
+        ঐ: "oi",
+        ও: "o",
+        ঔ: "ou",
+      },
+      matra = {
+        "া": "a",
+        "ি": "i",
+        "ী": "i",
+        "ু": "u",
+        "ূ": "u",
+        "ৃ": "ri",
+        "ে": "e",
+        "ৈ": "oi",
+        "ো": "o",
+        "ৌ": "ou",
+      },
+      mark = { "ং": "ng", "ঁ": "n", "ঃ": "h" },
+      digits = "০১২৩৪৫৬৭৮৯",
+      HOSONTO = "\u09CD";
+    for (let key of Object.keys(con)) con[key.normalize("NFC")] = con[key];
+    // Bengali ড়, ঢ় and য় are Unicode composition exclusions, so NFC never
+    // joins base+nukta: handle the nukta explicitly instead.
+    const NUKTA = "\u09BC",
+      nukta = {
+        "\u099C": "z",
+        "\u09A1": "r",
+        "\u09A2": "rh",
+        "\u09A3": "n",
+        "\u09AB": "f",
+        "\u09AF": "y",
+      };
+    return (text) => {
+      let chars = Array.from(String(text).normalize("NFC")),
+        out = "";
+      for (let i = 0; i < chars.length; i++) {
+        let ch = chars[i];
+        if (con[ch]) {
+          let value = con[ch],
+            j = i + 1;
+          if (chars[j] === NUKTA) {
+            value = nukta[ch] || value;
+            j++;
+          }
+          let after = chars[j];
+          if (after === HOSONTO) {
+            out += value;
+            i = j;
+            continue;
+          }
+          if (matra[after]) {
+            out += value + matra[after];
+            i = j;
+            continue;
+          }
+          out += value + (!after || !BENGALI.test(after) ? "" : "o");
+          i = j - 1;
+          continue;
+        }
+        if (vowel[ch]) out += vowel[ch];
+        else if (matra[ch]) out += matra[ch];
+        else if (mark[ch]) out += mark[ch];
+        else if (ch === HOSONTO) continue;
+        else if (digits.indexOf(ch) >= 0) out += digits.indexOf(ch);
+        else if (ch === "।") out += ".";
+        else if (ch === "৳") {
+          let amount = "";
+          while (i + 1 < chars.length && digits.indexOf(chars[i + 1]) >= 0)
+            amount += digits.indexOf(chars[++i]);
+          out += amount ? amount + " taka " : "taka ";
+        }
+        else out += ch;
+      }
+      return out.replace(/\s+/g, " ").trim();
+    };
+  })();
+  function voiceList() {
+    try {
+      return ("speechSynthesis" in window && speechSynthesis.getVoices()) || [];
+    } catch {
+      return [];
+    }
+  }
+  function bnVoice() {
+    let list = voiceList().filter((v) => /^bn/i.test(v.lang || ""));
+    return (
+      list.find((v) => /bd/i.test(v.lang)) ||
+      list.find((v) => /in/i.test(v.lang)) ||
+      list[0] ||
+      null
+    );
+  }
+  function latinVoice() {
+    let list = voiceList();
+    return (
+      list.find((v) => /^en[-_]?(gb|in|us)?/i.test(v.lang || "")) ||
+      list.find((v) => /^en/i.test(v.lang || "")) ||
+      list.find((v) => v.default) ||
+      list[0] ||
+      null
+    );
+  }
+  function voiceSay(text) {
+    if (!("speechSynthesis" in window) || !text) return;
+    let bengali = bnVoice(),
+      body = bengali ? text : BENGALI.test(text) ? LATIN(text) : text;
+    if (!body) return;
+    let u = new SpeechSynthesisUtterance(body);
+    if (bengali) {
+      u.voice = bengali;
+      u.lang = bengali.lang || "bn-BD";
+      u.rate = 1.02;
+    } else {
+      let fallback = latinVoice();
+      if (fallback) u.voice = fallback;
+      u.lang = (fallback && fallback.lang) || "en-US";
+      u.rate = 0.9;
+    }
+    u.pitch = 1;
+    u.volume = Math.max(0, Math.min(1, prefs.volume));
+    speakUtter = u;
+    u.onend = u.onerror = () => {
+      if (speakUtter === u) speakUtter = null;
+    };
+    clearTimeout(speakTimer);
+    try {
+      speechSynthesis.cancel();
+    } catch {}
+    // Chrome ignores a speak() that lands in the same tick as cancel().
+    speakTimer = setTimeout(() => {
+      if (speakUtter !== u) return;
+      try {
+        speechSynthesis.speak(u);
+      } catch {}
+    }, 60);
+  }
   function updateVoices() {
     let supported = "speechSynthesis" in window,
-      available = supported
-        ? speechSynthesis
-            .getVoices()
-            .some((v) => v.lang.toLowerCase().startsWith("bn"))
-        : false;
-    $("driveVoice").disabled = !available;
-    $("driveVoiceNote").textContent = available
-      ? "ডিভাইসের বাংলা ভয়েসে সংলাপ পড়বে; মূল রেকর্ডিং নয়"
-      : "এই ডিভাইসে বাংলা ভয়েস পাওয়া যায়নি";
-    if (!available) $("driveVoice").checked = false;
+      box = $("driveVoice"),
+      note = $("driveVoiceNote"),
+      bengali = supported ? bnVoice() : null,
+      fallback = supported ? latinVoice() : null;
+    box.disabled = !supported;
+    if (!supported) {
+      box.checked = false;
+      note.textContent = "এই ব্রাউজারে ভয়েস সাপোর্ট নেই";
+      return;
+    }
+    note.textContent = bengali
+      ? "ডিভাইসের বাংলা ভয়েসে সংলাপ পড়বে; মূল রেকর্ডিং নয়"
+      : fallback
+        ? "বাংলা ভয়েস নেই — ইংরেজি ভয়েসে বাংলা উচ্চারণ শোনানো হবে"
+        : "ভয়েস এখনো লোড হয়নি — সংলাপ এলে নিজেই চেষ্টা করবে";
   }
-  if ("speechSynthesis" in window)
+  // Debug hooks: lets support (and the smoke test) ask what this device can say,
+  // and see the Latin reading used when no Bengali voice is installed.
+  window.__voice = {
+    say: voiceSay,
+    latin: LATIN,
+    bengali: bnVoice,
+    fallback: latinVoice,
+    list: voiceList,
+  };
+  if ("speechSynthesis" in window) {
     speechSynthesis.addEventListener("voiceschanged", updateVoices);
+    setTimeout(updateVoices, 900);
+  }
   function maybeSpeak(snap) {
     if (
       !prefs.voice ||
@@ -46433,19 +47082,9 @@ three/build/three.module.js:
     let el = $("dialogue"),
       s = el && !el.hidden ? el.textContent.trim() : "";
     if (!s || s === lastVoice || performance.now() - voiceAt < 8500) return;
-    let voice = speechSynthesis
-      .getVoices()
-      .find((v) => v.lang.toLowerCase().startsWith("bn"));
-    if (!voice) return;
     voiceAt = performance.now();
     lastVoice = s;
-    let u = new SpeechSynthesisUtterance(s);
-    u.lang = voice.lang;
-    u.voice = voice;
-    u.volume = prefs.volume;
-    u.rate = 1.05;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
+    voiceSay(s);
   }
   function menuState(snap) {
     const on = snap.state === "menu";
@@ -46587,11 +47226,24 @@ three/build/three.module.js:
     clearTimeout(showNoticeTimer);
     showNoticeTimer = setTimeout(() => (n.hidden = true), 5500);
   }
+  let swHadController = !!navigator.serviceWorker?.controller,
+    swReloading = false,
+    swListening = false;
   async function offline() {
     if (location.protocol === "file:" || !("serviceWorker" in navigator))
       return;
     try {
       let reg = await navigator.serviceWorker.register("sw.js");
+      // The shell is served cache-first, so a new build only reaches the player
+      // after the worker swaps over: reload once, but never on a first install.
+      if (swHadController && !swListening) {
+        swListening = true;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (swReloading) return;
+          swReloading = true;
+          location.reload();
+        });
+      }
       if (!navigator.serviceWorker.controller) {
         let worker = reg.installing;
         if (worker)
