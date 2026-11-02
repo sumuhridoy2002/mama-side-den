@@ -13,6 +13,7 @@ window.__drivePrefs = (() => {
     largeControls: false,
     voice: false,
     funny: true,
+    cam: "chase",
     showFps: false,
   };
   try {
@@ -23876,7 +23877,9 @@ void main() {
                   ? "bribe"
                   : i === "crash_meme" || i === "dishum"
                     ? "beat"
-                    : i,
+                    : /^(?:dipjol|mosharraf|manna)_/.test(i)
+                      ? "funny"
+                      : i,
     Zf = "sound_bomb_2",
     Kv = 2.5,
     Zv =
@@ -23937,17 +23940,150 @@ void main() {
         this.el && !this.el.paused && this.el.pause();
       },
     },
+    // Every horn below is a tiny physical model of the real thing rather than a
+    // plain beep: two detuned "diaphragms" per note (that shimmering beat is what
+    // the ear reads as a horn), a resonant band-pass where the plastic trumpet
+    // sits, a relay click as the contact closes, a small pitch overshoot on the
+    // attack and a droop as the driver lets go. `warble` is the motor-driven
+    // flutter of the cheap electric horns; the rickshaw has `bell` instead.
     cp = {
-      car: { f: [415, 520], t: "sawtooth", lp: 1500, g: 0.07 },
-      micro: { f: [440, 554], t: "sawtooth", lp: 1500, g: 0.07 },
-      suv: { f: [330, 415], t: "sawtooth", lp: 1300, g: 0.09 },
-      police: { f: [523, 659], t: "sawtooth", lp: 1700, g: 0.08 },
-      bus: { f: [294, 370], t: "sawtooth", lp: 1400, g: 0.1 },
-      truck: { f: [220, 277], t: "sawtooth", lp: 1200, g: 0.1 },
-      leguna: { f: [392, 494], t: "sawtooth", lp: 1500, g: 0.07 },
-      cng: { f: [587, 740], t: "triangle", lp: 2200, g: 0.08 },
-      bike: { f: [659, 784], t: "triangle", lp: 2400, g: 0.06 },
-      auto: { f: [880, 1175], t: "triangle", lp: 2600, g: 0.06 },
+      car: {
+        f: [392, 494],
+        t: "sawtooth",
+        hp: 260,
+        bp: 1180,
+        q: 2.4,
+        pk: 1450,
+        pg: 6,
+        g: 0.34,
+        atk: 0.012,
+        rel: 0.07,
+        det: 6,
+      },
+      micro: {
+        f: [349, 440],
+        t: "sawtooth",
+        hp: 240,
+        bp: 1080,
+        q: 2.6,
+        pk: 1350,
+        pg: 6,
+        g: 0.32,
+        atk: 0.012,
+        rel: 0.07,
+        det: 6,
+      },
+      suv: {
+        f: [311, 392, 466],
+        t: "sawtooth",
+        hp: 210,
+        bp: 940,
+        q: 2.2,
+        pk: 1200,
+        pg: 7,
+        g: 0.4,
+        atk: 0.014,
+        rel: 0.08,
+        det: 5,
+      },
+      police: {
+        f: [523, 659],
+        t: "sawtooth",
+        hp: 300,
+        bp: 1500,
+        q: 2.8,
+        pk: 1900,
+        pg: 6,
+        g: 0.3,
+        atk: 0.01,
+        rel: 0.06,
+        det: 4,
+        warble: 9,
+        warbleDepth: 26,
+      },
+      bus: {
+        f: [233, 294, 349],
+        t: "sawtooth",
+        hp: 140,
+        bp: 720,
+        q: 1.7,
+        pk: 980,
+        pg: 8,
+        g: 0.44,
+        atk: 0.035,
+        rel: 0.14,
+        det: 3,
+      },
+      truck: {
+        f: [196, 247, 294],
+        t: "sawtooth",
+        hp: 120,
+        bp: 620,
+        q: 1.6,
+        pk: 850,
+        pg: 8,
+        g: 0.46,
+        atk: 0.04,
+        rel: 0.16,
+        det: 3,
+      },
+      leguna: {
+        f: [440, 554],
+        t: "sawtooth",
+        hp: 280,
+        bp: 1250,
+        q: 2.5,
+        pk: 1550,
+        pg: 6,
+        g: 0.3,
+        atk: 0.011,
+        rel: 0.06,
+        det: 6,
+      },
+      cng: {
+        f: [622, 784],
+        t: "triangle",
+        hp: 500,
+        bp: 2400,
+        q: 5,
+        pk: 2600,
+        pg: 7,
+        g: 0.3,
+        atk: 0.008,
+        rel: 0.05,
+        det: 8,
+        warble: 11,
+        warbleDepth: 16,
+      },
+      bike: {
+        f: [988, 1319],
+        t: "triangle",
+        hp: 700,
+        bp: 3100,
+        q: 6,
+        pk: 3300,
+        pg: 5,
+        g: 0.22,
+        atk: 0.006,
+        rel: 0.04,
+        det: 9,
+      },
+      auto: {
+        f: [740, 932],
+        t: "triangle",
+        hp: 560,
+        bp: 2700,
+        q: 5.5,
+        pk: 2900,
+        pg: 7,
+        g: 0.28,
+        atk: 0.008,
+        rel: 0.05,
+        det: 8,
+        warble: 13,
+        warbleDepth: 14,
+      },
+      bell: { bell: !0, g: 0.3 },
     },
     jf = class {
       constructor() {
@@ -24497,47 +24633,98 @@ void main() {
       }
       horn(t, e, n, s = 0.3, o = 0, r = null) {
         if (!this.ready) return;
-        let a = cp[t] || cp.car,
-          l = this.ctx,
+        let a = cp[t] || cp.car;
+        // A rickshaw has no horn at all: it has a thumb bell.
+        if (a.bell) return this.bell(e, n, s > 0.25 ? 2 : 1, r, o);
+        let l = this.ctx,
           c = l.currentTime + 0.01 + o,
           h =
             r ||
-            (e === null
+            (e == null
               ? this.ui
               : this.pan(e, 1.2, n, t === "bus" || t === "truck" ? 8 : 5)),
-          f = this.filt("lowpass", a.lp, 0.6),
-          u = this.filt("peaking", 900, 1);
-        u.gain.value = 3;
-        let d = this.gain(0);
-        (f.connect(u), u.connect(d), d.connect(h));
-        for (let b of a.f) {
-          let x = this.osc(a.t, b * 0.97);
-          (x.frequency.setValueAtTime(b * 0.97, c),
-            x.frequency.linearRampToValueAtTime(b, c + 0.06),
-            x.connect(f),
-            x.start(c),
-            x.stop(c + s + 0.12));
+          atk = a.atk ?? 0.01,
+          rel = a.rel ?? 0.07,
+          hold = c + Math.max(s, atk + 0.07),
+          end = hold + rel + 0.06,
+          tune = C(0.985, 1.015),
+          hp = this.filt("highpass", a.hp ?? 220, 0.7),
+          bp = this.filt("bandpass", a.bp ?? 1200, a.q ?? 2.4),
+          pk = this.filt("peaking", a.pk ?? 1500, 1.1),
+          mix = this.gain(1 / Math.max(2, a.f.length * 2)),
+          d = this.gain(0),
+          keep = [hp, bp, pk, mix, d];
+        ((pk.gain.value = a.pg ?? 6),
+          hp.connect(bp),
+          bp.connect(pk),
+          pk.connect(mix),
+          mix.connect(d),
+          d.connect(h));
+        // The contact click of the horn button, then the diaphragm snaps open.
+        let cl = this.src(this.noise("white", 0.05)),
+          cf = this.filt("bandpass", (a.bp ?? 1200) * 1.7, 1.3),
+          cg = this.gain(0);
+        (cl.connect(cf),
+          cf.connect(cg),
+          cg.connect(d),
+          cg.gain.setValueAtTime(0, c),
+          cg.gain.linearRampToValueAtTime(a.g * 0.5, c + 0.004),
+          cg.gain.exponentialRampToValueAtTime(1e-4, c + 0.045),
+          cl.start(c),
+          cl.stop(c + 0.06),
+          keep.push(cl, cf, cg));
+        // The motor-driven flutter of the cheap electric horns.
+        let lfo = null,
+          lg = null;
+        if (a.warble) {
+          ((lfo = this.osc("sine", a.warble)),
+            (lg = this.gain(a.warbleDepth ?? 12)),
+            lfo.connect(lg),
+            lfo.start(c),
+            lfo.stop(end),
+            keep.push(lfo, lg));
         }
+        // Two slightly detuned diaphragms per note: the beat between them is the
+        // shimmer that separates a real horn from a synthesiser beep.
+        for (let b of a.f)
+          for (let det of [-(a.det ?? 5), a.det ?? 5]) {
+            let bb = b * tune,
+              x = this.osc(a.t, bb),
+              v = this.gain(1 / a.f.length);
+            (x.frequency.setValueAtTime(bb * 0.94, c),
+              x.frequency.linearRampToValueAtTime(bb * 1.012, c + atk + 0.014),
+              x.frequency.setTargetAtTime(bb * 0.997, c + atk + 0.02, 0.09),
+              x.frequency.setTargetAtTime(bb * 0.94, hold, 0.09),
+              (x.detune.value = det));
+            (lg && lg.connect(x.detune),
+              x.connect(v),
+              v.connect(hp),
+              x.start(c),
+              x.stop(end),
+              keep.push(x, v));
+          }
         (d.gain.setValueAtTime(0, c),
-          d.gain.linearRampToValueAtTime(a.g, c + 0.03),
-          d.gain.setValueAtTime(a.g, c + s),
-          d.gain.linearRampToValueAtTime(0, c + s + 0.1),
-          this.gc(
-            [f, u, d, r || e === null ? null : h].slice(0, r ? 3 : 4),
-            o + s + 0.4,
-          ));
+          d.gain.linearRampToValueAtTime(a.g * 1.16, c + atk),
+          d.gain.linearRampToValueAtTime(a.g, c + atk + 0.07),
+          d.gain.setValueAtTime(a.g, hold),
+          d.gain.exponentialRampToValueAtTime(5e-4, hold + rel),
+          r || e == null || keep.push(h),
+          this.gc(keep, end - l.currentTime + 0.3));
       }
       honk(t, e, n, s = !1) {
         if (!this.ready) return;
         let o = this.ctx.currentTime;
-        o - this.hornClock < (s ? 0.8 : 1.8) ||
-          ((this.hornClock = o),
-          Ut(0.55)
-            ? (this.horn(t, e, n, 0.12), this.horn(t, e, n, 0.16, 0.2))
-            : this.horn(t, e, n, C(0.3, 0.6)));
+        if (o - this.hornClock < (s ? 0.8 : 1.8)) return;
+        this.hornClock = o;
+        // Rickshaws do not push traffic with a horn; the puller flicks his bell.
+        if ((cp[t] || cp.car).bell)
+          return void this.bell(e, n, Ut(0.5) ? 2 : 3);
+        Ut(0.55)
+          ? (this.horn(t, e, n, 0.12), this.horn(t, e, n, 0.16, 0.2))
+          : this.horn(t, e, n, C(0.3, 0.6));
       }
       distantHorn(t) {
-        let e = xt(["bus", "car", "cng", "truck", "car", "bike"]),
+        let e = xt(["bus", "car", "cng", "truck", "car", "bike", "bell", "bell"]),
           n = C(0, Math.PI * 2),
           s = C(70, 160),
           o = this.pan(
@@ -24595,12 +24782,15 @@ void main() {
             (this.hornNext = t + e.duration + 0.5));
           return;
         }
-        // This build ships no recorded clips, so synthesise the horn: two short
-        // blasts, alternating timbre, so H is never silent on any device.
-        let s = this.hornPlays++ % 2 ? "cng" : "auto";
-        (this.horn(s, null, 0, 0.14),
-          this.horn(s, null, 0, 0.22, 0.18),
-          (this.hornNext = t + 0.6));
+        // This build ships no recorded clips, so synthesise the player's own horn:
+        // the electric double-peep of an auto-rickshaw, or one longer press when
+        // the finger stays on the button.
+        this.hornPlays++;
+        let s = Ut(0.55);
+        (s
+          ? (this.horn("auto", null, 0, 0.11), this.horn("auto", null, 0, 0.13, 0.17))
+          : this.horn("auto", null, 0, 0.3),
+          (this.hornNext = t + (s ? 0.58 : 0.5)));
       }
       hornOff(t = !1) {
         var e;
@@ -24719,30 +24909,51 @@ void main() {
           ? Math.max(0, e.t0 + this.clips[t].duration - this.ctx.currentTime)
           : 0;
       }
-      bell(t, e, n = 3) {
+      bell(t, e, n = 3, s = null, o = 0) {
         if (!this.ready) return;
-        let s = this.ctx,
-          o = s.currentTime + 0.01,
-          r = this.pan(t, 1, e, 3),
-          a = C(0.94, 1.06),
-          l = [2350, 3480],
-          c = [0.025, 0.011],
-          h = [0.45, 0.28];
-        (l.forEach((f, u) => {
-          let d = this.osc("sine", f * a),
-            b = this.gain(0);
-          (d.connect(b), b.connect(r));
+        let l = this.ctx,
+          c = l.currentTime + 0.01 + o,
+          r = s || (t == null ? this.ui : this.pan(t, 1, e, 3));
+        // A rickshaw bell is a stamped steel dome: its partials are inharmonic and
+        // die at different rates, and the striker leaves a tiny metallic tick.
+        let det = C(0.95, 1.06),
+          parts = [
+            [1, 0.42, 0.44],
+            [2.01, 0.24, 0.3],
+            [2.98, 0.15, 0.22],
+            [4.42, 0.09, 0.15],
+            [6.1, 0.05, 0.1],
+          ],
+          gap = 0.11,
+          keep = [];
+        for (let [m, amp, life] of parts) {
+          let v = this.osc("sine", 2280 * det * m),
+            g = this.gain(0);
+          (v.connect(g), g.connect(r));
           for (let x = 0; x < n; x++) {
-            let g = o + x * 0.09;
-            (b.gain.setValueAtTime(c[u], g),
-              b.gain.exponentialRampToValueAtTime(
-                5e-4,
-                g + (x === n - 1 ? h[u] : 0.085),
+            let p = c + x * gap;
+            (g.gain.setValueAtTime(0, p),
+              g.gain.linearRampToValueAtTime(amp, p + 0.004),
+              g.gain.exponentialRampToValueAtTime(
+                1e-4,
+                p + (x === n - 1 ? life : gap * 0.8),
               ));
           }
-          (d.start(o), d.stop(o + n * 0.09 + h[u] + 0.05));
-        }),
-          this.gc([r], n * 0.09 + 0.8));
+          (v.start(c), v.stop(c + n * gap + life + 0.1), keep.push(v, g));
+        }
+        let tick = this.src(this.noise("white", 0.02)),
+          tf = this.filt("bandpass", 5200, 2),
+          tg = this.gain(0);
+        (tick.connect(tf),
+          tf.connect(tg),
+          tg.connect(r),
+          tick.start(c),
+          tick.stop(c + 0.03),
+          tg.gain.setValueAtTime(0.05, c),
+          tg.gain.exponentialRampToValueAtTime(1e-4, c + 0.02),
+          keep.push(tick, tf, tg),
+          s || keep.push(r),
+          this.gc(keep, n * gap + 1));
       }
       creak() {
         let t = this.ctx.currentTime + 0.01,
@@ -25439,6 +25650,12 @@ void main() {
             for (let n in e) {
               if (n[0] === "_") continue;
               let s = typeof e[n] == "string" ? e[n] : e[n] && e[n].file;
+              // A recording can carry its own caption: {"file": "x.mp3", "text": "…"}.
+              // The UI shows that text while the clip plays, so a build that ships
+              // real dialogue never displays a line the recording doesn't say.
+              let d = e[n] && typeof e[n] == "object" ? e[n].text : "";
+              if (typeof d == "string" && (d = d.trim()))
+                (this.clipText || (this.clipText = {}))[n] = d;
               if (!s || this.clips[n]) continue;
               let o = /^(?:https?:|data:|\.{0,2}\/)/.test(s) ? s : "sounds/" + s;
               fetch(o)
@@ -25607,13 +25824,17 @@ void main() {
           ((this.pedLast = "laugh"), this.laugh());
         }
       }
+      // True while a clip that outranks this one owns the foreground channel.
+      // Ambient chatter (priority 0 — a long funny recording) does not count, so
+      // a crowd shout or a hit reaction can still cut in mid-sentence.
+      busyFor(t) {
+        let e = this.foreground;
+        return (
+          !!e && e.until > this.ctx.currentTime && (e.protect || e.priority >= t)
+        );
+      }
       mobShout(t, e) {
-        if (
-          !this.ready ||
-          this.muted ||
-          (this.foreground && this.foreground.until > this.ctx.currentTime)
-        )
-          return null;
+        if (!this.ready || this.muted || this.busyFor(1)) return null;
         let n = Kf.map((c, h) => h).filter(
           (c) => this.clips["mob_shout_" + (c + 1)],
         );
@@ -25629,8 +25850,12 @@ void main() {
           x: t,
           z: e,
         });
+        // The bubble above the mob quotes the recording's own caption when the
+        // manifest ships one, otherwise the written line.
         return l
-          ? ((this.mobShoutSrc = l), (this.mobShoutAt = s), Kf[r])
+          ? ((this.mobShoutSrc = l),
+            (this.mobShoutAt = s),
+            (this.clipText && this.clipText["mob_shout_" + (r + 1)]) || Kf[r])
           : null;
       }
       stopMobShout() {
@@ -25688,7 +25913,14 @@ void main() {
   window.__audio = {
     ready: () => !!ut.ready,
     clips: () => Object.keys(ut.clips || {}),
-    play: (t, e = 1, n = 3) => !!ut.playForeground(t, e, n),
+    // Priority 0 means "ambient chatter": gameplay reactions and the horn may cut
+    // it. `hold` caps how long it owns the channel (and how long the street mix
+    // stays ducked), so a 20-second recording cannot silence the whole run.
+    play: (t, e = 1, n = 3, hold = 0) => !!ut.playForeground(t, e, n, null, hold),
+    dur: (t) => (ut.clips && ut.clips[t] ? ut.clips[t].duration : 0),
+    // Caption shipped with the clip in ./sounds/manifest.json ("" when the build
+    // has no recording, so the UI falls back to its own written line).
+    text: (t) => (ut.clipText && ut.clipText[t]) || "",
   };
   var hp = [
       {
@@ -29744,44 +29976,64 @@ float boAmt() { return uBlackout.w * (1.0 - smoothstep(uBlackout.z * 0.7, uBlack
     );
   }
   function N_(i, t, e, n, s = !1) {
-    let o = new ct();
-    s ||
-      (o.cyl(0, 0.33, -1.05, 0.33, 0.06, ve, { axis: "x", seg: 14 }),
-      o.cyl(0, 0.33, -1.05, 0.08, 0.08, ei, { axis: "x" }));
-    for (let r of [-0.58, 0.58])
-      (o.cyl(r, 0.33, 0.55, 0.33, 0.06, ve, { axis: "x", seg: 14 }),
-        o.cyl(r, 0.33, 0.55, 0.08, 0.08, ei, { axis: "x" }));
-    for (let [r, a] of [
-      [0, -1.05],
-      [-0.58, 0.55],
-      [0.58, 0.55],
-    ]) {
-      if (!(s && a < 0))
-        for (let l of [-1, 1]) {
-          (o.cyl(r + l * 0.037, 0.33, a, 0.284, 0.012, 13162454, {
+    let o = new ct(),
+      rubber = 1973790,
+      tread = 1052688,
+      wall = 15132390,
+      mat = 2236962,
+      dark = 1315860,
+      plate = 13684944,
+      glass = 16773576,
+      lamp = 11805726;
+    // A wheel is a wheel, not a disc: a black tyre on its tread band, the cream
+    // rim face Dhaka pullers keep painted, chrome rings, twelve spoke pairs, the
+    // hub and the axle nut.
+    let wheel = (r, a) => {
+      if (s && a < 0) return;
+      (o.cyl(r, 0.33, a, 0.36, 0.13, rubber, { axis: "x", seg: 18 }),
+        o.cyl(r, 0.33, a, 0.373, 0.07, tread, {
+          axis: "x",
+          open: !0,
+          seg: 18,
+        }),
+        o.cyl(r, 0.33, a, 0.305, 0.136, wall, { axis: "x", seg: 18 }),
+        o.cyl(r, 0.33, a, 0.08, 0.17, ei, { axis: "x" }),
+        o.cyl(r, 0.33, a, 0.038, 0.19, ve, { axis: "x", seg: 8 }));
+      for (let l of [-1, 1]) {
+        (o.cyl(r + l * 0.071, 0.33, a, 0.275, 0.006, 13162454, {
+          axis: "x",
+          seg: 18,
+        }),
+          o.cyl(r + l * 0.077, 0.33, a, 0.25, 0.006, 4608599, {
             axis: "x",
-            seg: 16,
-          }),
-            o.cyl(r + l * 0.046, 0.33, a, 0.252, 0.016, 4608599, {
-              axis: "x",
-              seg: 16,
-            }));
-          for (let c = 0; c < 10; c++)
-            o.box(r + l * 0.059, 0.33, a, 0.012, 0.51, 0.009, 14805221, {
-              rx: (c * k) / 10,
-            });
-        }
-      o.cyl(r, 0.33, a, 0.36, 0.13, t, {
-        axis: "x",
-        open: !0,
-        theta: k,
-        seg: 12,
-      });
-    }
+            seg: 18,
+          }));
+        for (let c = 0; c < 12; c++)
+          o.box(r + l * 0.082, 0.33, a, 0.008, 0.5, 0.008, 14805221, {
+            rx: (c * k) / 12,
+          });
+      }
+    };
+    wheel(0, -1.05);
+    for (let r of [-0.58, 0.58]) wheel(r, 0.55);
+    // Mudguards: stamped sheet following the tyre, one over each rear wheel and a
+    // narrow one on the front fork — the detail that reads as "real" at a glance.
+    let guard = (r, a, dir, wide) => {
+      for (let l = 0; l < 7; l++) {
+        let c = 0.32 + l * 0.28,
+          h = 0.33 + Math.sin(c) * 0.43,
+          f = a + dir * Math.cos(c) * 0.43;
+        o.box(r, h, f, wide, 0.035, 0.135, t, {
+          rx: dir > 0 ? -(k / 2 + c) : c - k / 2,
+        });
+      }
+    };
+    for (let r of [-0.58, 0.58]) guard(r, 0.55, 1, 0.42);
+    guard(0, -1.05, -1, 0.17);
     if (
       (o.box(0, 0.33, 0.55, 1.16, 0.05, 0.05, ve),
       o.box(0, 0.75, -0.75, 0.07, 0.07, 0.75, t, { rx: 0.45 }),
-      o.box(0, 0.75, -1.02, 0.06, 0.8, 0.06, ei),
+      o.box(0, 0.9, -1.02, 0.06, 0.5, 0.06, ei),
       o.box(0, 0.98, -0.55, 0.22, 0.07, 0.3, 1315860),
       o.box(0, 1.14, -0.98, 0.56, 0.04, 0.04, ei),
       o.box(0, 0.48, -0.05, 0.95, 0.04, 0.5, t),
@@ -29801,24 +30053,67 @@ float boAmt() { return uBlackout.w * (1.0 - smoothstep(uBlackout.z * 0.7, uBlack
         o.box(0, 1, -1.15, 0.14, 0.12, 0.08, ts),
         o.box(0, 0.7, -1.05, 0.12, 0.05, 0.5, t));
     }
+    // Front end: fork blades down to the axle, the steering head nut, rubber
+    // grips and brake levers on the bar, and the striker bell the puller keeps
+    // squeezing — the sound the game now rings back at the player.
+    for (let r of [-1, 1])
+      (o.box(r * 0.105, 0.53, -1.045, 0.028, 0.42, 0.042, t, { rx: 0.07 }),
+        o.box(r * 0.105, 0.33, -1.05, 0.04, 0.05, 0.05, ei),
+        o.cyl(r * 0.268, 1.14, -0.985, 0.031, 0.11, dark, {
+          axis: "x",
+          seg: 8,
+        }),
+        o.box(r * 0.165, 1.115, -0.935, 0.026, 0.026, 0.14, ve));
+    (o.box(0, 0.62, -1.02, 0.1, 0.05, 0.1, ve),
+      o.cyl(-0.19, 1.185, -0.955, 0.045, 0.05, ve, { seg: 10 }),
+      o.box(-0.19, 1.155, -0.9, 0.05, 0.014, 0.03, ei),
+      o.cyl(0, 1.215, -0.99, 0.055, 0.08, ve, { axis: "z", seg: 12 }),
+      o.cyl(0, 1.215, -1.038, 0.046, 0.016, glass, { axis: "z", seg: 12 }),
+      o.box(0, 1.05, -1.005, 0.05, 0.24, 0.05, ei),
+      o.box(0, 0.98, -1.148, 0.32, 0.28, 0.012, plate),
+      o.box(0, 0.98, -1.158, 0.25, 0.2, 0.008, 3355443));
+    // Footboard with its grip ridges, the chassis tubes under the floor, leaf
+    // springs down to the rear axle and the step the passengers climb over.
+    (o.box(0, 0.504, -0.05, 0.87, 0.022, 0.42, mat),
+      o.box(0, 0.38, 1.02, 0.9, 0.045, 0.07, ei),
+      o.cyl(0, 0.38, 1.02, 0.028, 0.9, ei, { axis: "x", seg: 6 }));
+    for (let r = 0; r < 5; r++)
+      o.box(0, 0.517, -0.22 + r * 0.085, 0.8, 0.008, 0.02, 1118481);
+    for (let r of [-1, 1])
+      (o.box(r * 0.3, 0.45, 0.22, 0.045, 0.045, 1.55, ei),
+        o.box(r * 0.3, 0.4, 0.35, 0.05, 0.026, 0.95, ei),
+        o.box(r * 0.365, 0.5, 0.98, 0.075, 0.09, 0.045, lamp));
+    // The backrest is a real lacquered frame: top rail, side stiles and the
+    // boards the seat pad is nailed to.
+    (o.box(0, 1.415, 0.72, 1.08, 0.075, 0.1, t),
+      o.box(0, 0.925, 0.745, 1.06, 0.07, 0.07, t));
+    for (let r of [-1, 1])
+      (o.box(r * 0.515, 1.16, 0.72, 0.07, 0.44, 0.1, t),
+        o.box(r * 0.6, 1, 0.06, 0.04, 0.3, 0.04, ei),
+        o.box(r * 0.6, 1, 0.8, 0.04, 0.3, 0.04, ei));
+    for (let r = -2; r <= 2; r++)
+      o.box(r * 0.2, 1.3, 0.765, 0.045, 0.17, 0.035, t);
     return o.build();
   }
   function D_() {
     let i = new ct();
-    (i.cyl(0, 0, 0, 0.33, 0.06, ve, { axis: "x", seg: 14 }),
-      i.cyl(0, 0, 0, 0.08, 0.08, ei, { axis: "x" }));
+    (i.cyl(0, 0, 0, 0.36, 0.13, 1973790, { axis: "x", seg: 18 }),
+      i.cyl(0, 0, 0, 0.373, 0.07, 1052688, { axis: "x", open: !0, seg: 18 }),
+      i.cyl(0, 0, 0, 0.305, 0.136, 15132390, { axis: "x", seg: 18 }),
+      i.cyl(0, 0, 0, 0.08, 0.17, ei, { axis: "x" }),
+      i.cyl(0, 0, 0, 0.038, 0.19, ve, { axis: "x", seg: 8 }));
     for (let t of [-1, 1]) {
-      (i.cyl(t * 0.037, 0, 0, 0.284, 0.012, 13162454, {
+      (i.cyl(t * 0.071, 0, 0, 0.275, 0.006, 13162454, {
         axis: "x",
-        seg: 16,
+        seg: 18,
       }),
-        i.cyl(t * 0.046, 0, 0, 0.252, 0.016, 4608599, {
+        i.cyl(t * 0.077, 0, 0, 0.25, 0.006, 4608599, {
           axis: "x",
-          seg: 16,
+          seg: 18,
         }));
-      for (let e = 0; e < 10; e++)
-        i.box(t * 0.059, 0, 0, 0.012, 0.51, 0.009, 14805221, {
-          rx: (e * k) / 10,
+      for (let e = 0; e < 12; e++)
+        i.box(t * 0.082, 0, 0, 0.008, 0.5, 0.008, 14805221, {
+          rx: (e * k) / 12,
         });
     }
     return i.build();
@@ -36664,8 +36959,7 @@ varying float vBulb;
                 ((s.panicT = 0.9),
                 (s.credit = e + 3),
                 (s.tgt = h + ((o ? V.x : V.z) > h ? -1 : 1) * C(2.2, 3.4)),
-                Ut(0.5) &&
-                  ut.honk(x.horn === "bell" ? "auto" : x.horn, s.x, s.z, !0));
+                Ut(0.5) && ut.honk(x.horn, s.x, s.z, !0));
             }
             if (
               (s.panicT > 0 && ((s.panicT -= t), (E = Math.min(E, -7))),
@@ -43131,7 +43425,13 @@ varying float vBulb;
           c = Math.max(r.lo + 4, Math.min(r.hi - 4, s + a * is.ahead));
         if ((c - s) * a < -4) return;
         this.lastClip || (this.lastClip = NS[Math.floor(G.dice() * 2)]);
-        let h = this.lastClip === "hawker" ? "hawker_2" : "hawker",
+        // Alternate calls, but never pick a slot the build has no clip for: with
+        // only hawker_1 recorded the old code asked for hawker_2, got 0 and then
+        // asked for it again forever, so the vendors went silent.
+        let h =
+          NS.find((c) => c !== this.lastClip && ut.clips[c]) ||
+          NS.find((c) => ut.clips[c]) ||
+          "hawker",
           f = Re(e, n, c, l * 12.8),
           u = is.gap[0] + G.dice() * (is.gap[1] - is.gap[0]),
           d = ut.muted
@@ -44777,18 +45077,42 @@ varying float vBulb;
           ),
             Gr.set(p.x, 1.2, p.z - 2));
         } else if (this.state === "play") {
-          let a = (t ? 7.5 : 6.4) + Math.abs(p.v) * 0.08;
+          // Five angles, all expressed in the rickshaw's own frame, so speed,
+          // steering and drifting feed into every one of them. C (or the camera
+          // button) cycles them; the preset itself is persisted in the settings.
+          let a = camPresets[camName] || camPresets.chase,
+            l = Math.abs(p.v),
+            c = camName === "hood" ? 1 : t ? 1.15 : 1,
+            h = a.back * c + l * a.grow,
+            f =
+              a.h +
+              (camName === "hood" ? 0 : t ? 0.85 : 0) +
+              l * a.rise +
+              p.air * (camName === "hood" ? 0.9 : 0.6),
+            u = a.side || 0,
+            d = p.steer * (camName === "hood" ? 0.12 : 0.5);
+          if (camName === "side")
+            this.viewClear(
+              p.x - p.fx * a.back + p.rx * u,
+              p.z - p.fz * a.back + p.rz * u,
+              p.x,
+              p.z,
+            ) || (u = -u);
           (Ai.set(
-            p.x - p.fx * a - p.rx * p.steer * 0.5,
-            (t ? 4.5 : 3.6) + Math.abs(p.v) * 0.04 + p.air * 0.6,
-            p.z - p.fz * a - p.rz * p.steer * 0.5,
+            p.x - p.fx * h + p.rx * (u - d),
+            f,
+            p.z - p.fz * h + p.rz * (u - d),
           ),
             Gr.set(
-              p.x + p.fx * (t ? 9 : 6),
-              0.9 + p.air * 0.7,
-              p.z + p.fz * (t ? 9 : 6),
+              p.x + p.fx * a.ahead,
+              a.lookY + p.air * 0.7,
+              p.z + p.fz * a.ahead,
             ),
-            (n += Math.abs(p.v) * (t ? 1 : 0.7) + (p.boost ? 7 : 0)));
+            (n =
+              a.fov +
+              (t ? 5 : 0) +
+              l * (camName === "close" ? 0.5 : 0.3) +
+              (p.boost ? 6 : 0)));
         } else if (this.cause === "bus" && this.deathCam) {
           let a = p.fly && !p.fly.landed ? p.fly.y : 0,
             l = this.deathCam.x - p.x,
@@ -44813,9 +45137,10 @@ varying float vBulb;
           (Ai.set(p.x + Math.sin(a) * 5.8, 7.8, p.z + Math.cos(a) * 5.8),
             Gr.set(p.x, 0.65, p.z));
         }
-        for (let a = 0; a < 8 && xe(Ai.x, Ai.z).block; a++)
+        let hood = this.state === "play" && camName === "hood";
+        for (let a = 0; a < 8 && !hood && xe(Ai.x, Ai.z).block; a++)
           ((Ai.x = ze(Ai.x, p.x, 0.3)), (Ai.z = ze(Ai.z, p.z, 0.3)));
-        let s = this.state === "play" ? 7 : 2.5;
+        let s = this.state === "play" ? (hood ? 16 : 7) : 2.5;
         ((Hi.x = Pe(Hi.x, Ai.x, s, i)),
           (Hi.y = Pe(Hi.y, Ai.y, s, i)),
           (Hi.z = Pe(Hi.z, Ai.z, s, i)),
@@ -45301,6 +45626,12 @@ varying float vBulb;
         ((Ye[n.code] = !0),
           n.code === "KeyM" && $a(),
           n.code === "KeyH" && G.state === "play" && ut.hornOn(),
+          n.code === "KeyC" &&
+            G.state === "play" &&
+            !n.ctrlKey &&
+            !n.metaKey &&
+            !n.altKey &&
+            window.__cycleCam && window.__cycleCam(),
           n.code === "KeyB" && G.state === "play" && G.soundBomb(),
           (n.code === "Enter" || n.code === "Space") &&
             G.state === "menu" &&
@@ -45413,7 +45744,7 @@ varying float vBulb;
       gi && (N("#keysNote").hidden = !0),
       gi &&
         (N("#keysHelp").innerHTML =
-          '<span class="k"><kbd>‹</kbd><kbd>›</kbd> ঘোরান</span><span class="k"><kbd>˄</kbd> চালান</span><span class="k"><kbd>˅</kbd> ব্রেক</span><span class="k"><kbd>⚡</kbd> টান দেন</span><span class="k"><kbd>হর্ন</kbd> পিপপিপ</span><span class="k"><kbd>শব্দবোমা</kbd> ঢাকা কাঁপান</span>'));
+          '<span class="k"><kbd>‹</kbd><kbd>›</kbd> ঘোরান</span><span class="k"><kbd>˄</kbd> চালান</span><span class="k"><kbd>˅</kbd> ব্রেক</span><span class="k"><kbd>⚡</kbd> টান দেন</span><span class="k"><kbd>হর্ন</kbd> পিপপিপ</span><span class="k"><kbd>শব্দবোমা</kbd> ঢাকা কাঁপান</span><span class="k"><kbd>C</kbd> ক্যামেরা</span>'));
   }
   var uh = [
       ["tLeft", "left"],
@@ -45576,6 +45907,7 @@ varying float vBulb;
       i(["Shift", "Space"], "টান দেন: জোরে, চার্জ বেশি যায়") +
       i(["H"], "হর্ন") +
       i(["B"], "শব্দবোমা") +
+      i(["C"], "ক্যামেরা") +
       i(["M"], "শব্দ");
   }
   var Cg = 5,
@@ -45955,6 +46287,33 @@ varying float vBulb;
       copSaid: Zn.copSaid,
       dialogue: N("#dialogue").hidden ? "" : N("#dialogue").textContent,
     });
+  // Camera angles: "chase" is the classic view behind the auto; "close" hugs the
+  // paint for speed; "side" is the TV shot; "top" looks down on the jam; "hood"
+  // sits on the nose of the auto for a driver's-eye run. C cycles them, the HUD
+  // camera button does the same on a phone, and the choice is remembered.
+  var camList = ["chase", "close", "side", "top", "hood"],
+    camPresets = {
+      chase: { back: 6.4, h: 3.6, ahead: 6, lookY: 0.9, fov: 64, grow: 0.08, rise: 0.04 },
+      close: { back: 3.5, h: 1.85, ahead: 8, lookY: 0.85, fov: 72, grow: 0.05, rise: 0.012 },
+      side: { back: 2.9, side: 3.9, h: 1.9, ahead: 0.6, lookY: 0.9, fov: 52, grow: 0.02, rise: 0.01 },
+      top: { back: 1.2, h: 8, ahead: 0.8, lookY: 0.45, fov: 56, grow: 0.02, rise: 0.02 },
+      hood: { back: -1.15, h: 1.42, ahead: 16, lookY: 1.02, fov: 79, grow: 0.02, rise: 0 },
+    },
+    camName = camList.includes(window.__drivePrefs.cam)
+      ? window.__drivePrefs.cam
+      : "chase";
+  function setCamPreset(i) {
+    return (camName = camList.includes(i) ? i : "chase");
+  }
+  function nextCamPreset() {
+    return setCamPreset(camList[(camList.indexOf(camName) + 1) % camList.length]);
+  }
+  window.__cam = {
+    list: camList,
+    get: () => camName,
+    set: setCamPreset,
+    next: nextCamPreset,
+  };
   var lw = 1280,
     gr = { dist: 5.8, h: 2, lookY: 0.9, fov: 56, at: -0.12 },
     Xr = { back: 5, ahead: 1.5, h: 1.6, lookY: 2, fov: 50, at: 0.08 },
@@ -46297,6 +46656,7 @@ varying float vBulb;
           ut.setMuted(!!settings.muted);
           Rg();
         }
+        if (settings.cam !== undefined) setCamPreset(settings.cam);
         if (settings.volume !== undefined && ut.master)
           ut.master.gain.setTargetAtTime(
             ut.muted ? 0 : 1.1 * settings.volume,
@@ -46710,6 +47070,22 @@ three/build/three.module.js:
       ? "পরিবর্তন সংরক্ষিত হয়েছে।"
       : "এই ব্রাউজারে পছন্দ সংরক্ষণ করা যাচ্ছে না; বর্তমান সেশনে প্রযোজ্য।";
   }
+  // The five camera angles, in the words a Dhaka driver would use.
+  const camLabels = {
+    chase: "পেছন থেকে",
+    close: "একদম কাছে",
+    side: "পাশ থেকে",
+    top: "ওপর থেকে",
+    hood: "সামনে থেকে",
+  };
+  function cycleCam() {
+    const name = window.__cam ? window.__cam.next() : prefs.cam;
+    save({ cam: name });
+    notice("ক্যামেরা: " + (camLabels[name] || "পেছন থেকে"));
+    return name;
+  }
+  window.__cycleCam = cycleCam;
+  window.__camLabel = (name) => camLabels[name] || camLabels.chase;
   function open(which) {
     if (!api) return;
     const snap = api.snapshot();
@@ -46744,9 +47120,10 @@ three/build/three.module.js:
     $("driveShowFps").checked = !!prefs.showFps;
     $("driveVoice").checked = !!prefs.voice;
     $("driveFunny").checked = prefs.funny !== false;
+    $("driveCam").value = window.__cam ? window.__cam.get() : prefs.cam;
     let caps = api.features();
     $("driveCapability").textContent =
-      "WebGL 3D: " +
+      "থ্রিডি গ্রাফিক্স: " +
       (caps.webgl ? "চালু" : "প্রিভিউ") +
       " • ভিডিও: " +
       (caps.replay ? "সমর্থিত" : "এই ব্রাউজারে নেই") +
@@ -46761,7 +47138,7 @@ three/build/three.module.js:
           ? "প্রস্তুত"
           : "প্রস্তুত হচ্ছে");
     $("driveSettingsNote").textContent =
-      "উচ্চ FPS নিশ্চিত নয়; ডিভাইস ও দৃশ্যের জটিলতা অনুযায়ী বদলাবে।";
+      "উচ্চ এফপিএস নিশ্চিত নয়; ডিভাইস ও দৃশ্যের জটিলতা অনুযায়ী বদলাবে।";
     updateVoices();
   }
   $("settingsOpen").onclick = () => open("settings");
@@ -46776,6 +47153,12 @@ three/build/three.module.js:
   );
   $("driveQuality").onchange = (e) => save({ quality: e.target.value });
   $("driveFrameRate").onchange = (e) => save({ fps: +e.target.value });
+  $("driveCam").onchange = (e) => {
+    save({ cam: e.target.value });
+    notice("ক্যামেরা: " + (camLabels[e.target.value] || camLabels.chase));
+  };
+  // The camera button in the HUD does exactly what C does on a keyboard.
+  $("camBtn").onclick = cycleCam;
   $("driveTime").onchange = (e) => save({ time: e.target.value });
   $("driveStart").onchange = (e) => {
     save({ start: e.target.value });
@@ -47167,14 +47550,27 @@ three/build/three.module.js:
   }
   // A recording wins over the synthesised voice: any loaded clip whose name
   // starts with the persona key (dipjol_1, dipjol_2 …) is picked at random.
+  // Returns what the persona actually got: the clip name, its caption and its
+  // length, or `silent` when this build has no recording for that persona (the
+  // device voice reads the written line instead). A recording that is merely
+  // busy stays quiet: the next line comes in half a minute, so nothing talks
+  // over it.
   function funnyClip(key) {
     try {
       let a = window.__audio;
-      if (!a || !a.ready()) return false;
+      if (!a || !a.ready()) return { silent: true };
       let hit = a.clips().filter((n) => n.indexOf(key + "_") === 0);
-      return hit.length ? a.play(hit[(Math.random() * hit.length) | 0], 1, 3) : false;
+      if (!hit.length) return { silent: true };
+      let name = hit[(Math.random() * hit.length) | 0],
+        dur = a.dur(name),
+        // Fourteen seconds of monologue is plenty; after that any reaction may
+        // take the channel (and the street mix comes back up).
+        hold = Math.min(dur, 14);
+      return a.play(name, 1, 0, hold)
+        ? { name: name, text: a.text(name), dur: dur }
+        : { silent: false };
     } catch {
-      return false;
+      return { silent: true };
     }
   }
   function sayFunny(force, snap) {
@@ -47186,21 +47582,40 @@ three/build/three.module.js:
     if ("speechSynthesis" in window && speechSynthesis.speaking && !force)
       return null;
     let pick = funnyLine(),
-      played = funnyClip(pick.key);
-    funnyNext = now + funnyGap[0] + Math.random() * (funnyGap[1] - funnyGap[0]);
-    if (!played && !("speechSynthesis" in window)) return null;
-    if (!played)
+      played = funnyClip(pick.key),
+      said = (played.name && played.text) || pick.line,
+      // A recording owns its own airtime: the written lines get the same gap they
+      // always had, but the clip's length is added so the auto does not talk from
+      // start to finish of the run.
+      gap = funnyGap[0] + Math.random() * (funnyGap[1] - funnyGap[0]);
+    funnyNext = now + gap + (played.dur || 0) * 1000;
+    if (!played.name) {
+      // Nothing played: either this persona has no recording (so the device voice
+      // reads the written line) or the channel is busy with something louder —
+      // then this round stays quiet instead of talking over it.
+      if (!played.silent || !("speechSynthesis" in window)) return null;
       voiceSay(pick.line, { pitch: pick.p.pitch, rate: pick.p.rate });
-    notice(pick.line);
-    return { persona: pick.p.name, line: pick.line, played };
+    }
+    notice(said);
+    return {
+      persona: pick.p.name,
+      line: said,
+      clip: played.name || "",
+      played: !!played.name,
+    };
   }
   window.__funny = {
     say: (key) => {
       let p = FUNNY[key] || FUNNY[Object.keys(FUNNY)[0]],
-        line = p.lines[(Math.random() * p.lines.length) | 0];
-      if (!funnyClip(key)) voiceSay(line, { pitch: p.pitch, rate: p.rate });
-      notice(line);
-      return line;
+        line = p.lines[(Math.random() * p.lines.length) | 0],
+        played = funnyClip(key),
+        said = (played.name && played.text) || line;
+      if (!played.name) {
+        if (!played.silent) return "";
+        voiceSay(line, { pitch: p.pitch, rate: p.rate });
+      }
+      notice(said);
+      return said;
     },
     lines: FUNNY,
     next: () => funnyNext - performance.now(),
@@ -47262,7 +47677,8 @@ three/build/three.module.js:
     }
     menuState(snap);
     $("driveSpeed").textContent = bn(snap.speed);
-    $("drivePerf").textContent = fps + " FPS · " + snap.quality;
+    $("drivePerf").textContent =
+      fps + " এফপিএস · " + (names[snap.quality] || snap.quality);
     $("driveGearName").textContent =
       snap.charge <= 0.001
         ? "প্যাডেল মোড"

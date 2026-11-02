@@ -1,6 +1,7 @@
 {
   "_howto": "নিজের রেকর্ড করা বা লাইসেন্স করা ফাইল ./sounds/ এ রাখুন, তারপর নিচের ফাঁকা জায়গায় শুধু ফাইলের নাম লিখুন (যেমন \"horn_meme\": \"horn.mp3\")। বিস্তারিত: sounds/README.txt",
   "_note": "ফাঁকা নাম মানে ওই শব্দটা গেম নিজেই সিন্থেসাইজ করবে — কিছু না দিলেও গেমে শব্দ কমবে না।",
+  "_text": "ফাইলের নামের বদলে {\"file\": \"x.mp3\", \"text\": \"যা বলা হচ্ছে\"} লিখলে গেম ওই লেখাটাই সাবটাইটেল/বাবলে দেখাবে — রেকর্ডিং যেটা বলে, স্ক্রিনে ঠিক সেটাই থাকবে। text না দিলে গেমের নিজের লেখা লাইন দেখাবে।",
 
   "horn_meme": "",
   "khela_hobe": "",
@@ -19,20 +20,22 @@
   "rag_korla": "",
   "sound_bomb_1": "",
   "sound_bomb_2": "",
-  "mob_shout_1": "",
-  "mob_shout_2": "",
-  "mob_shout_3": "",
+  "mob_shout_1": { "file": "hisab-bujho-na-dudu-khao.mp3", "text": "হিসাব বুঝো না? দুধু খাও!" },
+  "mob_shout_2": { "file": "engreji-marao.mp3", "text": "…ইংরেজি মারাও" },
+  "mob_shout_3": "patkhat-a-jabe-ajairapublick-made-with-Voicemod.mp3",
   "woman_shout_1": "",
   "woman_shout_2": "",
   "woman_protishodh": "",
   "woman_thappor": "",
-  "hawker": "",
+  "hawker": { "file": "assalamualaika_boro_vai.mp3", "text": "আসসালামু আলাইকুম, বড় ভাই!" },
   "hawker_2": "",
 
-  "dipjol_1": "",
-  "dipjol_2": "",
-  "mosharraf_1": "",
-  "mosharraf_2": "",
-  "manna_1": "",
-  "manna_2": ""
+  "dipjol_1": { "file": "dipjol-aj-pothom-bar.mp3", "text": "আজ প্রথমবার…" },
+  "dipjol_2": { "file": "dipjol-mandar-pola.mp3", "text": "মন্দের পোলা…" },
+  "dipjol_3": "kara-beya-kortasot.mp3",
+  "mosharraf_1": { "file": "ami-tension-kinchi.mp3", "text": "আমি টেনশন কিনছি…" },
+  "mosharraf_2": "tale-phone-rakhbena-made-with-Voicemod.mp3",
+  "manna_1": { "file": "khankir-pola-by-manna.mp3", "text": "খানকির পোলা…" },
+  "manna_2": { "file": "ami-tmr-premer-pagol.mp3", "text": "আমি তোমার প্রেমের পাগল…" }
 }
+

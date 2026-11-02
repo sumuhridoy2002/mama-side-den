@@ -57,6 +57,37 @@
             </div>
             <div class="hud-btns">
               <button
+                id="camBtn"
+                type="button"
+                aria-label="ক্যামেরা বদলান"
+                title="ক্যামেরা (C)"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect
+                    x="2.5"
+                    y="7"
+                    width="12"
+                    height="10"
+                    rx="2.4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  />
+                  <circle
+                    cx="8.4"
+                    cy="12"
+                    r="2.9"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  />
+                  <path
+                    d="M15 10.2l5.2-2.6a.7.7 0 0 1 1 .6v7.6a.7.7 0 0 1-1 .6L15 13.8z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+              <button
                 id="pauseBtn"
                 type="button"
                 aria-label="থামান"
@@ -357,15 +388,15 @@
               <span class="k"><kbd>W</kbd><kbd>↑</kbd> চালান</span
               ><span class="k"><kbd>S</kbd><kbd>↓</kbd> ব্রেক</span
               ><span class="k"><kbd>A</kbd><kbd>D</kbd> ঘোরান</span
-              ><span class="k"><kbd>Shift</kbd><kbd>Space</kbd> টান দেন</span
+              ><span class="k"><kbd>শিফট</kbd><kbd>স্পেস</kbd> টান দেন</span
               ><span class="k"><kbd>H</kbd> হর্ন</span
               ><span class="k"><kbd>B</kbd> শব্দবোমা</span
               ><span class="k"><kbd>M</kbd> শব্দ</span>
-            </div>
+            <span class="k"><kbd>C</kbd> ক্যামেরা</span></div>
             <p class="keys-note" id="keysNote">
               <span data-nosnippet
-                >কিছু কিবোর্ড ↑ + ← + Space একসাথে ধরতে পারে না। তখন Space-এর
-                বদলে ডান Shift চাপেন, অথবা ↑ ছেড়ে শুধু Space ধরেন: টান দিলে অটো
+                >কিছু কিবোর্ড ↑ + ← + স্পেস একসাথে ধরতে পারে না। তখন স্পেস-এর
+                বদলে ডান শিফট চাপেন, অথবা ↑ ছেড়ে শুধু স্পেস ধরেন: টান দিলে অটো
                 এমনিই চলে।</span
               >
             </p>
@@ -400,7 +431,7 @@
         </div>
         <p class="menu-note">
           <span title="মূল রেকর্ড করা ভয়েস ক্লিপ ও অনলাইন সেবা এই সোর্সে সরবরাহ করা হয়নি"
-            >HTML · CSS · JavaScript</span
+            >এইচটিএমএল · সিএসএস · জাভাস্ক্রিপ্ট</span
           ><span aria-hidden="true"> · </span
           ><a href="#" target="_blank" rel="noopener"
             >গাইড</a
@@ -417,9 +448,9 @@
           href="#"
           target="_blank"
           rel="noopener"
-          lang="en"
-          ><i class="face" aria-hidden="true"></i>Made by
-          <b>Ali Azgor Hridoy</b
+          lang="bn"
+          ><i class="face" aria-hidden="true"></i>বানিয়েছেন
+          <b>আলী আজগর হৃদয়</b
           ><svg viewBox="0 0 12 12" aria-hidden="true">
             <path d="M4 2h6v6M10 2 3 9" /></svg
         ></a>
@@ -560,9 +591,9 @@
                 href="#"
                 target="_blank"
                 rel="noopener"
-                lang="en"
-                ><i class="face" aria-hidden="true"></i>Made by
-                <b>Ali Azgor Hridoy</b
+                lang="bn"
+                ><i class="face" aria-hidden="true"></i>বানিয়েছেন
+                <b>আলী আজগর হৃদয়</b
                 ><svg viewBox="0 0 12 12" aria-hidden="true">
                   <path d="M4 2h6v6M10 2 3 9" /></svg
               ></a>
@@ -603,9 +634,9 @@
                 href="#"
                 target="_blank"
                 rel="noopener"
-                lang="en"
-                ><i class="face" aria-hidden="true"></i>Made by
-                <b>Ali Azgor Hridoy</b
+                lang="bn"
+                ><i class="face" aria-hidden="true"></i>বানিয়েছেন
+                <b>আলী আজগর হৃদয়</b
                 ><svg viewBox="0 0 12 12" aria-hidden="true">
                   <path d="M4 2h6v6M10 2 3 9" /></svg
               ></a>
@@ -770,7 +801,7 @@
       <div id="ticker" data-nosnippet hidden>
         <span class="tag" id="tickerTag">খবর</span>
         <div class="track"></div>
-        <span class="url" lang="en" aria-hidden="true">brakeKoiMama.com</span>
+        <span class="url" lang="bn" aria-hidden="true">brakeKoiMama.com</span>
       </div>
       <div id="loading" data-nosnippet>
         <div class="ld">
@@ -796,8 +827,8 @@
   <div id="driveTop" hidden class="drive-top"><a href="#" class="drive-logo" aria-label="ব্রেক কই মামা? হোম"><span>BR<span class="logo-dot">●</span></span></a><div class="drive-nav"><button id="recordsOpen" type="button">রেকর্ড <span>↗</span></button><button id="settingsOpen" type="button" aria-label="সেটিংস খুলুন">⚙ <span>সেটিংস</span></button></div></div>
 
 <div id="driveStats" hidden class="drive-menu-stats"><div><span>নিজের সেরা</span><b id="driveBest">৳০</b></div><div><span>সংরক্ষিত অভিযান</span><b id="driveRuns">০</b></div><div><span>গ্রাফিক্স</span><b id="driveQualityName">স্বয়ংক্রিয়</b></div></div>
-<div id="driveCluster" hidden aria-hidden="true"><div><b id="driveSpeed">০</b><small>কিমি/ঘণ্টা</small></div><span class="cluster-rule"></span><div class="drive-gear-info"><small id="driveGearName">প্রস্তুত</small><span id="driveBoostReady">টান: Shift</span></div><div id="drivePerf" hidden>— FPS</div></div>
-<section id="driveSettings" class="drive-overlay" role="dialog" aria-modal="true" aria-labelledby="driveSettingsTitle" hidden><div class="drive-dialog"><div class="drive-dialog-head"><div><h2 id="driveSettingsTitle">আপনার মতো করে চালান</h2></div><button class="drive-close" id="settingsClose" aria-label="সেটিংস বন্ধ করুন">×</button></div><p class="drive-dialog-intro">কম শক্তির ফোনে স্বয়ংক্রিয় মোড রাখুন। গেম প্রয়োজনমতো গ্রাফিক্স কমিয়ে নেবে।</p><div class="drive-setting-grid"><label>গ্রাফিক্স<select id="driveQuality"><option value="auto">স্বয়ংক্রিয় — প্রস্তাবিত</option><option value="0">উচ্চ — ছায়াসহ</option><option value="1">ব্যালান্সড</option><option value="2">লো — দ্রুত</option><option value="3">সর্বনিম্ন — দুর্বল ফোন</option></select></label><label>ফ্রেম রেট<select id="driveFrameRate"><option value="60">৬০ FPS লক্ষ্য</option><option value="30">৩০ FPS — ব্যাটারি সাশ্রয়</option></select></label><label>দিনের সময়<select id="driveTime"><option value="auto">অভিযান অনুযায়ী বদলাবে</option><option value="morning">সকাল</option><option value="afternoon">বিকেল</option><option value="dusk">গোধূলি</option><option value="night">রাত</option></select></label><label>কোথা থেকে শুরু করবেন<select id="driveStart"><option value="auto">প্রতি রানে নতুন জায়গা</option><option value="shahbag">শাহবাগ</option><option value="gulistan">গুলিস্তান</option><option value="mirpur10">মিরপুর ১০</option><option value="uttara">উত্তরা</option><option value="jatrabari">যাত্রাবাড়ী</option></select></label></div><label class="drive-volume" for="driveVolume">শব্দের মাত্রা <output id="driveVolumeValue">৭০%</output><input id="driveVolume" type="range" min="0" max="100" step="5"></label><div class="drive-toggles"><label><span>কম অ্যানিমেশন<small>স্ক্রিন শেক ও বাড়তি নড়াচড়া কমান</small></span><input type="checkbox" id="driveMotion"></label><label><span>বড় টাচ বোতাম<small>ফোনে আঙুলের জন্য বাড়তি জায়গা</small></span><input type="checkbox" id="driveLarge"></label><label><span>FPS দেখান<small>চলার সময় বাস্তব ফ্রেম রেট</small></span><input type="checkbox" id="driveShowFps"></label><label><span>বাংলা ডিভাইস ভয়েস<small id="driveVoiceNote">ডিভাইসে বাংলা ভয়েস থাকলে সংলাপ পড়বে</small></span><input type="checkbox" id="driveVoice"></label><label><span>ফানি ডায়ালগ<small>রাস্তায় মজার বাংলা লাইন — ভিলেন, অফিস-ক্লান্ত মামা, হিরো</small></span><input type="checkbox" id="driveFunny"></label></div><div id="driveCapability" class="drive-capability"></div><p id="driveSettingsNote" role="status"></p><button class="drive-primary" id="settingsDone">ঠিক আছে, মামা ↗</button></div></section>
+<div id="driveCluster" hidden aria-hidden="true"><div><b id="driveSpeed">০</b><small>কিমি/ঘণ্টা</small></div><span class="cluster-rule"></span><div class="drive-gear-info"><small id="driveGearName">প্রস্তুত</small><span id="driveBoostReady">টান: শিফট</span></div><div id="drivePerf" hidden>— এফপিএস</div></div>
+<section id="driveSettings" class="drive-overlay" role="dialog" aria-modal="true" aria-labelledby="driveSettingsTitle" hidden><div class="drive-dialog"><div class="drive-dialog-head"><div><h2 id="driveSettingsTitle">আপনার মতো করে চালান</h2></div><button class="drive-close" id="settingsClose" aria-label="সেটিংস বন্ধ করুন">×</button></div><p class="drive-dialog-intro">কম শক্তির ফোনে স্বয়ংক্রিয় মোড রাখুন। গেম প্রয়োজনমতো গ্রাফিক্স কমিয়ে নেবে।</p><div class="drive-setting-grid"><label>গ্রাফিক্স<select id="driveQuality"><option value="auto">স্বয়ংক্রিয় — প্রস্তাবিত</option><option value="0">উচ্চ — ছায়াসহ</option><option value="1">ব্যালান্সড</option><option value="2">লো — দ্রুত</option><option value="3">সর্বনিম্ন — দুর্বল ফোন</option></select></label><label>ক্যামেরা<select id="driveCam"><option value="chase">পেছন থেকে</option><option value="close">একদম কাছে</option><option value="side">পাশ থেকে</option><option value="top">ওপর থেকে</option><option value="hood">সামনে থেকে</option></select></label><label>ফ্রেম রেট<select id="driveFrameRate"><option value="60">৬০ এফপিএস লক্ষ্য</option><option value="30">৩০ এফপিএস — ব্যাটারি সাশ্রয়</option></select></label><label>দিনের সময়<select id="driveTime"><option value="auto">অভিযান অনুযায়ী বদলাবে</option><option value="morning">সকাল</option><option value="afternoon">বিকেল</option><option value="dusk">গোধূলি</option><option value="night">রাত</option></select></label><label>কোথা থেকে শুরু করবেন<select id="driveStart"><option value="auto">প্রতি রানে নতুন জায়গা</option><option value="shahbag">শাহবাগ</option><option value="gulistan">গুলিস্তান</option><option value="mirpur10">মিরপুর ১০</option><option value="uttara">উত্তরা</option><option value="jatrabari">যাত্রাবাড়ী</option></select></label></div><label class="drive-volume" for="driveVolume">শব্দের মাত্রা <output id="driveVolumeValue">৭০%</output><input id="driveVolume" type="range" min="0" max="100" step="5"></label><div class="drive-toggles"><label><span>কম অ্যানিমেশন<small>স্ক্রিন শেক ও বাড়তি নড়াচড়া কমান</small></span><input type="checkbox" id="driveMotion"></label><label><span>বড় টাচ বোতাম<small>ফোনে আঙুলের জন্য বাড়তি জায়গা</small></span><input type="checkbox" id="driveLarge"></label><label><span>এফপিএস দেখান<small>চলার সময় বাস্তব ফ্রেম রেট</small></span><input type="checkbox" id="driveShowFps"></label><label><span>বাংলা ডিভাইস ভয়েস<small id="driveVoiceNote">ডিভাইসে বাংলা ভয়েস থাকলে সংলাপ পড়বে</small></span><input type="checkbox" id="driveVoice"></label><label><span>ফানি ডায়ালগ<small>রাস্তায় মজার বাংলা লাইন — ভিলেন, অফিস-ক্লান্ত মামা, হিরো</small></span><input type="checkbox" id="driveFunny"></label></div><div id="driveCapability" class="drive-capability"></div><p id="driveSettingsNote" role="status"></p><button class="drive-primary" id="settingsDone">ঠিক আছে, মামা ↗</button></div></section>
 <section id="driveRecords" class="drive-overlay" role="dialog" aria-modal="true" aria-labelledby="driveRecordsTitle" hidden><div class="drive-dialog"><div class="drive-dialog-head"><div><h2 id="driveRecordsTitle">নিজের মোস্ট ওয়ান্টেড</h2></div><button id="recordsClose" class="drive-close" aria-label="রেকর্ড বন্ধ করুন">×</button></div><p class="drive-dialog-intro">এই ব্রাউজারের সর্বশেষ ৩০টি সংরক্ষিত অভিযান। এটি অনলাইন বা অন্য খেলোয়াড়ের লিডারবোর্ড নয়।</p><div class="drive-tabs" role="tablist" aria-label="রেকর্ডের সময়"><button id="recordAll" role="tab" aria-selected="true">সব সংরক্ষিত</button><button id="recordWeek" role="tab" aria-selected="false">গত ৭ দিন</button></div><div id="driveRecordList"></div><button id="recordsExport" class="drive-secondary">অভিযানের রিপোর্ট ডাউনলোড ↓</button></div></section>
 <div id="driveOfflineNotice" role="status" hidden></div>
 <script src="script.js"></script></body>

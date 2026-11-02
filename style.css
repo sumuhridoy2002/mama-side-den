@@ -350,7 +350,8 @@ button:focus-visible {
   gap: 8px;
 }
 #muteBtn,
-#pauseBtn {
+#pauseBtn,
+#camBtn {
   pointer-events: auto;
   display: grid;
   place-items: center;
@@ -370,6 +371,14 @@ button:focus-visible {
 #pauseBtn svg {
   width: 20px;
   height: 20px;
+}
+/* the camera button: same circle as pause, one icon for the five angles (C) */
+#camBtn {
+  color: #d9f0e2;
+}
+#camBtn svg {
+  width: 21px;
+  height: 21px;
 }
 #muteBtn.off {
   color: #ff8f8f;
@@ -3097,7 +3106,8 @@ h1.title {
   padding: 2px 6px;
 }
 #muteBtn,
-#pauseBtn {
+#pauseBtn,
+#camBtn {
   min-width: 44px;
   min-height: 44px;
   font-size: 12px;
@@ -3866,6 +3876,7 @@ h1.title,
 /* 6 · every icon button keeps a 44 px thumb target, whatever the screen */
 #pauseBtn,
 #muteBtn,
+#camBtn,
 .np-home,
 .np-share-open,
 .np-install,
@@ -3888,6 +3899,7 @@ h1.title,
   .menu-fs,
   #muteBtn,
   #pauseBtn,
+  #camBtn,
   .tbtn,
   .w-tabs button,
   .help summary,
@@ -3923,6 +3935,7 @@ h1.title,
   }
   #muteBtn:hover,
   #pauseBtn:hover,
+  #camBtn:hover,
   .tbtn:hover {
     background: rgba(255, 255, 255, 0.2);
     border-color: #fff;
@@ -4448,6 +4461,7 @@ h1.title {
 }
 #muteBtn,
 #pauseBtn,
+#camBtn,
 #driveGear {
   border-radius: 6px;
   height: 34px;
@@ -4853,6 +4867,24 @@ h1.title {
   border-radius: 7px;
   background: #17372cf2;
   color: #ffebae;
+}
+/* While driving, the spoken line (funny dialogue, camera toasts) sits above the
+   speed cluster instead of on top of it: the auto talks every 20-40 seconds now
+   that real recordings ship, so the two must not fight for the same pixels. */
+body[data-drive-state="play"] #driveOfflineNotice {
+  bottom: calc(var(--band) + 96px);
+}
+@media (max-width: 800px) {
+  body[data-drive-state="play"] #driveOfflineNotice {
+    bottom: calc(var(--band) + 208px);
+    font-size: 11px;
+    padding: 8px 14px;
+  }
+}
+@media (max-height: 620px) {
+  body[data-drive-state="play"] #driveOfflineNotice {
+    bottom: calc(var(--band) + 82px);
+  }
 }
 .drive-reduce *,
 .drive-reduce *::after,
