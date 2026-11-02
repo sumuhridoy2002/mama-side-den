@@ -12,6 +12,7 @@ window.__drivePrefs = (() => {
     reducedMotion: false,
     largeControls: false,
     voice: false,
+    funny: true,
     showFps: false,
   };
   try {
@@ -25427,6 +25428,28 @@ void main() {
               n && t(e, n);
             })
             .catch(() => {});
+        // Recordings are optional: ./sounds/manifest.json maps a clip name (the
+        // same keys the game already asks for, e.g. horn_meme, khela_hobe,
+        // punch) to a file, so a build can ship without audio and still sound
+        // complete, and dropping a file in never needs a code change.
+        fetch("sounds/manifest.json", { cache: "no-cache" })
+          .then((e) => (e.ok ? e.json() : null))
+          .then((e) => {
+            if (!e || typeof e != "object") return;
+            for (let n in e) {
+              if (n[0] === "_") continue;
+              let s = typeof e[n] == "string" ? e[n] : e[n] && e[n].file;
+              if (!s || this.clips[n]) continue;
+              let o = /^(?:https?:|data:|\.{0,2}\/)/.test(s) ? s : "sounds/" + s;
+              fetch(o)
+                .then((r) => (r.ok ? r.arrayBuffer() : null))
+                .then((r) => {
+                  r && t(n, r);
+                })
+                .catch(() => {});
+            }
+          })
+          .catch(() => {});
       }
       clip(t, e, n = 1) {
         let s = this.clips[t];
@@ -25660,6 +25683,13 @@ void main() {
     },
     jv = new Set(["car", "suv", "police", "micro", "leguna", "van"]),
     ut = new jf();
+  // The UI layer lives outside this module, so the only bridge it has to recorded
+  // clips is here. Keeps the engine's mixing (volume, ducking, pan) intact.
+  window.__audio = {
+    ready: () => !!ut.ready,
+    clips: () => Object.keys(ut.clips || {}),
+    play: (t, e = 1, n = 3) => !!ut.playForeground(t, e, n),
+  };
   var hp = [
       {
         name: "high",
@@ -46713,6 +46743,7 @@ three/build/three.module.js:
     $("driveLarge").checked = !!prefs.largeControls;
     $("driveShowFps").checked = !!prefs.showFps;
     $("driveVoice").checked = !!prefs.voice;
+    $("driveFunny").checked = prefs.funny !== false;
     let caps = api.features();
     $("driveCapability").textContent =
       "WebGL 3D: " +
@@ -46761,6 +46792,7 @@ three/build/three.module.js:
     ["driveLarge", "largeControls"],
     ["driveShowFps", "showFps"],
     ["driveVoice", "voice"],
+    ["driveFunny", "funny"],
   ])
     $(id).onchange = (e) => save({ [key]: e.target.checked });
   // Speak a sample the moment the voice switch is turned on, so the player hears
@@ -47005,7 +47037,7 @@ three/build/three.module.js:
       null
     );
   }
-  function voiceSay(text) {
+  function voiceSay(text, tune) {
     if (!("speechSynthesis" in window) || !text) return;
     let bengali = bnVoice(),
       body = bengali ? text : BENGALI.test(text) ? LATIN(text) : text;
@@ -47014,14 +47046,14 @@ three/build/three.module.js:
     if (bengali) {
       u.voice = bengali;
       u.lang = bengali.lang || "bn-BD";
-      u.rate = 1.02;
+      u.rate = (tune && tune.rate) || 1.02;
     } else {
       let fallback = latinVoice();
       if (fallback) u.voice = fallback;
       u.lang = (fallback && fallback.lang) || "en-US";
-      u.rate = 0.9;
+      u.rate = (tune && tune.rate) || 0.9;
     }
-    u.pitch = 1;
+    u.pitch = (tune && tune.pitch) || 1;
     u.volume = Math.max(0, Math.min(1, prefs.volume));
     speakUtter = u;
     u.onend = u.onerror = () => {
@@ -47070,6 +47102,120 @@ three/build/three.module.js:
     speechSynthesis.addEventListener("voiceschanged", updateVoices);
     setTimeout(updateVoices, 900);
   }
+  // ── ফানি ডায়ালগ ──────────────────────────────────────────────────────────
+  // Three *style* tributes: lines written for this game in the register of a
+  // villain, a deadpan office man and an action hero. No film audio is bundled.
+  // A clip dropped into ./sounds and named dipjol_1 / mosharraf_1 / manna_1 (see
+  // sounds/manifest.json) is played instead of the device voice, so the build
+  // works with recordings, without them, or offline.
+  const FUNNY = {
+      dipjol: {
+        name: "ভিলেন",
+        pitch: 0.7,
+        rate: 0.92,
+        lines: [
+          "এই রাস্তা আমার বাপের না, তোর বাপেরও না — ঢাকা সবার।",
+          "আমাকে চিনস না? ভালো, আমিও নিজেকে চিনি না।",
+          "আমার গাড়িতে হর্ন মারলে ভাতিজা, মামলা সানডে মানডে ক্লোজ।",
+          "তুই অটো চালাস, আমি ভয় চালাই — দুজনেই ব্যবসায়ী।",
+          "বাতাসে টাকা উড়ছে দেখস? ওটা আমার বাতাস।",
+          "একটা কথা মনে রাখিস: ঢাকায় দেরি হওয়া মানে পৌঁছে যাওয়া।",
+          "আমার নাম ভুলে যা, কিন্তু গাড়ির রং মনে রাখিস।",
+        ],
+      },
+      mosharraf: {
+        name: "অফিস-ক্লান্ত",
+        pitch: 1.05,
+        rate: 1.08,
+        lines: [
+          "লাইসেন্স নাই, সার্টিফিকেট নাই — কিন্তু আত্মবিশ্বাস সিনিয়র অফিসারের মতো।",
+          "জ্যামে দাঁড়িয়ে ভাবছি, চাকরি ছেড়ে দিলে এই অটোই পেট চালাবে।",
+          "কেউ স্যার বলে ডাকলে ভয় পাই না, বেতন বাড়ানোর কথা মনে পড়ে।",
+          "আমার একটা চার্জার দরকার, আর একটা নতুন জীবন।",
+          "হর্ন দিলাম না — ভদ্রলোকেরা হর্ন দেয় না, ভদ্রলোকদের গাড়িও নাই।",
+          "এই শহরে সবাই দ্রুত যেতে চায়, আমি শুধু বাসার দিকে।",
+          "চা খেতে খেতেই মামলা ক্লোজ — এটাই এই দেশের সবচেয়ে বড় ডিজিটাল সার্ভিস।",
+        ],
+      },
+      manna: {
+        name: "হিরো",
+        pitch: 0.85,
+        rate: 0.98,
+        lines: [
+          "ভয় পাই না মামা, ভয় শুধু পেট্রোলের দামে।",
+          "একটা হাত স্টিয়ারিংয়ে, আরেকটা টাকার জন্য — হিরোর জীবন।",
+          "পুলিশ আসুক, বাস আসুক, আমি শুধু ব্রেক ভুলে গেছি।",
+          "বীরের মতো বাঁচব না, কিন্তু ভাড়াটা ঠিকমতো নেব।",
+          "ঢাকার রাস্তা অ্যাকশন সিনেমার সেট, শুধু ক্যামেরাম্যান নাই।",
+          "যত ধাক্কা, তত গল্প — মোটরে গিয়ে বলব।",
+          "মা বলেছিলেন ভালো ছেলে হবি, আমি অটো চালক হলাম। কাছাকাছি।",
+        ],
+      },
+    },
+    funnyGap = [20000, 42000];
+  let funnyNext = 0,
+    funnyLast = "";
+  function funnyLine() {
+    let keys = Object.keys(FUNNY),
+      key = keys[(Math.random() * keys.length) | 0],
+      p = FUNNY[key],
+      line = p.lines[(Math.random() * p.lines.length) | 0];
+    for (let i = 0; i < 6 && line === funnyLast; i++)
+      line = p.lines[(Math.random() * p.lines.length) | 0];
+    funnyLast = line;
+    return { key, p, line };
+  }
+  // A recording wins over the synthesised voice: any loaded clip whose name
+  // starts with the persona key (dipjol_1, dipjol_2 …) is picked at random.
+  function funnyClip(key) {
+    try {
+      let a = window.__audio;
+      if (!a || !a.ready()) return false;
+      let hit = a.clips().filter((n) => n.indexOf(key + "_") === 0);
+      return hit.length ? a.play(hit[(Math.random() * hit.length) | 0], 1, 3) : false;
+    } catch {
+      return false;
+    }
+  }
+  function sayFunny(force, snap) {
+    if (!api || prefs.funny === false) return null;
+    snap = snap || api.snapshot();
+    if (snap.muted || snap.paused || snap.state !== "play") return null;
+    let now = performance.now();
+    if (!force && now < funnyNext) return null;
+    if ("speechSynthesis" in window && speechSynthesis.speaking && !force)
+      return null;
+    let pick = funnyLine(),
+      played = funnyClip(pick.key);
+    funnyNext = now + funnyGap[0] + Math.random() * (funnyGap[1] - funnyGap[0]);
+    if (!played && !("speechSynthesis" in window)) return null;
+    if (!played)
+      voiceSay(pick.line, { pitch: pick.p.pitch, rate: pick.p.rate });
+    notice(pick.line);
+    return { persona: pick.p.name, line: pick.line, played };
+  }
+  window.__funny = {
+    say: (key) => {
+      let p = FUNNY[key] || FUNNY[Object.keys(FUNNY)[0]],
+        line = p.lines[(Math.random() * p.lines.length) | 0];
+      if (!funnyClip(key)) voiceSay(line, { pitch: p.pitch, rate: p.rate });
+      notice(line);
+      return line;
+    },
+    lines: FUNNY,
+    next: () => funnyNext - performance.now(),
+    // Same path the game uses (mute/pause/state/pref gates included), for support.
+    once: () => sayFunny(!0),
+    // Support hook: null means the audio engine is out of reach, an array is the
+    // clip names it actually decoded from ./sounds/manifest.json.
+    clips: () => {
+      try {
+        return window.__audio ? window.__audio.clips() : null;
+      } catch {
+        return "error";
+      }
+    },
+  };
   function maybeSpeak(snap) {
     if (
       !prefs.voice ||
@@ -47134,7 +47280,10 @@ three/build/three.module.js:
     if (snap.paused || snap.state !== "play") {
       if ("speechSynthesis" in window && speechSynthesis.speaking)
         speechSynthesis.cancel();
-    } else maybeSpeak(snap);
+    } else {
+      maybeSpeak(snap);
+      sayFunny(!1, snap);
+    }
   }
   function ready() {
     if (api) return;

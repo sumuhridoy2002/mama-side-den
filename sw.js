@@ -1,6 +1,6 @@
 /* Offline game shell only. Never caches sign-in routes or external data. */
 const PREFIX = "brake-koi-mama:" + self.registration.scope + ":";
-const CACHE = PREFIX + "final-20261103";
+const CACHE = PREFIX + "final-20261104";
 const ASSETS = [
   "./",
   "./index.html",
